@@ -1,0 +1,42 @@
+<?xml version = "1.0"?>
+
+<!-- Nico Feld - 1169233 -->
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name = "TRAM" basedir = "." default = "build" >
+    <property name = "src.dir" value = "src"/>
+    <property name = "build.dir" value = "${basedir}/META-INF/classes"/>
+    <property name = "name" value = "TRAM"/>
+
+    <path id = "master-classpath">
+        <pathelement path = "${build.dir}"/>
+    </path>
+
+
+    <target name = "build" description = "Compile source tree fst files" depends="clean">
+        <ivy:retrieve/>
+    </target>
+
+    <target name="jar" depends="build">
+        <jar destfile="${basedir}/${ant.project.name}.jar" basedir="${build.dir}">
+            <zipgroupfileset dir="lib" includes="log4j-1.2.17.jar"/>
+            <manifest>
+                <attribute name="Main-Class" value="de.unitrier.st.uap.s18.tram.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name = "run" depends="jar">
+        <java jar="${basedir}/${ant.project.name}.jar" fork="true"/>
+    </target>
+
+    <target name = "clean" description = "Clean output directories">
+        <ivy:cleancache/>
+        <delete includeemptydirs="true">
+            <fileset dir = "${basedir}" defaultexcludes="false" includes="**/META-INF/"/>
+        </delete>
+        <delete>
+            <fileset dir = "${basedir}" includes="${ant.project.name}.jar"/>
+        </delete>
+
+    </target>
+</project>
