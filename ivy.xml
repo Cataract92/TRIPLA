@@ -1,0 +1,11 @@
+<!--
+  ~ Nico Feld - 1169233
+  -->
+
+<ivy-module version="2.0">
+    <info organisation="apache" module="TRAM"/>
+    <dependencies>
+        <dependency org="de.jflex" name="jflex" rev="1.6.1"/>
+        <dependency org="nz.ac.waikato.cms.weka.thirdparty" name="java-cup-11b" rev="2015.03.26"/>
+    </dependencies>
+</ivy-module>

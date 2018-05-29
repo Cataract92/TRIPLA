@@ -1,0 +1,154 @@
+import java_cup.runtime.*;
+import tripla.*;
+
+/* Parser code to change the way the parser reports errors (include
+   line and column number of the error). */
+parser code {:
+    
+    /* Change the method report_error so it will display the line and
+       column of where the error occurred in the input as well as the
+       reason for the error which is passed into the method in the
+       String 'message'. */
+    public void report_error(String message, Object info) {
+   
+        /* Create a StringBuilder called 'm' with the string 'Error' in it. */
+        StringBuilder m = new StringBuilder("Error");
+   
+        /* Check if the information passed to the method is the same
+           type as the type java_cup.runtime.Symbol. */
+        if (info instanceof java_cup.runtime.Symbol) {
+            /* Declare a java_cup.runtime.Symbol object 's' with the
+               information in the object info that is being typecasted
+               as a java_cup.runtime.Symbol object. */
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+   
+            /* Check if the line number in the input is greater or
+               equal to zero. */
+            if (s.left >= 0) {                
+                /* Add to the end of the StringBuilder error message
+                   the line number of the error in the input. */
+                m.append(" in line "+(s.left+1));   
+                /* Check if the column number in the input is greater
+                   or equal to zero. */
+                if (s.right >= 0)                    
+                    /* Add to the end of the StringBuilder error message
+                       the column number of the error in the input. */
+                    m.append(", column "+(s.right+1));
+            }
+        }
+   
+        /* Add to the end of the StringBuilder error message created in
+           this method the message that was passed into this method. */
+        m.append(" : "+message);
+   
+        /* Print the contents of the StringBuilder 'm', which contains
+           an error message, out on a line. */
+        System.err.println(m);
+    }
+   
+    /* Change the method report_fatal_error so when it reports a fatal
+       error it will display the line and column number of where the
+       fatal error occurred in the input as well as the reason for the
+       fatal error which is passed into the method in the object
+       'message' and then exit.*/
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+
+/* Terminals (tokens returned by the scanner). */
+terminal Symbol LET, IN, IF, THEN, ELSE;
+terminal Symbol ASSIGN, PARANTHESIS_OPEN, PARANTHESIS_CLOSE, BRACE_OPEN, BRACE_CLOSE, COMMA, SEMICOLON;
+terminal Symbol OP_PLUS, OP_MINUS, OP_MUL, OP_DIV, OP_EQ, OP_NEQ, OP_GT, OP_LT;
+terminal String ID; 
+terminal Integer CONST;
+
+/* Non terminals */
+non terminal SyntaxNode E, D, A, V;
+
+/* Precedences  */
+precedence left COMMA, SEMICOLON, ID;
+precedence left ASSIGN;
+precedence left OP_EQ, OP_NEQ, OP_LT, OP_GT;
+precedence left OP_PLUS, OP_MINUS;
+precedence left OP_MUL, OP_DIV;
+
+
+/* The grammar */
+start with E;
+
+E ::=
+		LET D:d IN E:e
+		{:RESULT = new SyntaxNode(Code.LET_IN, d, e);:}
+		| 
+		ID:i
+		{:RESULT = new SyntaxNode(Code.ID,i);:}
+		| 
+		ID:i PARANTHESIS_OPEN A:a PARANTHESIS_CLOSE
+		{:RESULT = new SyntaxNode(Code.FUNCTION, new SyntaxNode(Code.ID,i), a);:}
+		| 
+		E:e1 OP_MUL E:e2
+		{:RESULT = new SyntaxNode(Code.OP_MUL, e1, e2);:}
+		| 
+		E:e1 OP_DIV E:e2
+		{:RESULT = new SyntaxNode(Code.OP_DIV, e1, e2);:}
+		| 
+		E:e1 OP_PLUS E:e2
+		{:RESULT = new SyntaxNode(Code.OP_PLUS, e1, e2);:}
+		| 
+		E:e1 OP_MINUS E:e2
+		{:RESULT = new SyntaxNode(Code.OP_MINUS, e1, e2);:}
+		| 
+		E:e1 OP_EQ E:e2
+		{:RESULT = new SyntaxNode(Code.OP_EQ, e1, e2);:}
+		| 
+		E:e1 OP_NEQ E:e2
+		{:RESULT = new SyntaxNode(Code.OP_NEQ, e1, e2);:}
+		| 
+		E:e1 OP_GT E:e2
+		{:RESULT = new SyntaxNode(Code.OP_GT, e1, e2);:}
+		| 
+		E:e1 OP_LT E:e2
+		{:RESULT = new SyntaxNode(Code.OP_LT, e1, e2);:}
+		| 
+		PARANTHESIS_OPEN E:e PARANTHESIS_CLOSE
+		{:RESULT = new SyntaxNode(Code.PARENTHESES, e);:}
+		| 
+		CONST:c
+		{:RESULT = new SyntaxNode(Code.CONST,c);:}
+		| 
+		ID:i ASSIGN E:e
+		{:RESULT = new SyntaxNode(Code.ASSIGN, new SyntaxNode(Code.ID,i), e);:}
+		| 
+		E:e1 SEMICOLON E:e2
+		{:RESULT = new SyntaxNode(Code.SEMICOLON, e1, e2);:}
+		| 
+		IF E:e1 THEN E:e2 ELSE E:e3
+		{:RESULT = new SyntaxNode(Code.IF_THEN_ELSE, e1, e2, e3);:}
+	;
+		
+A ::= 
+		E:e 
+		{:RESULT = e;:}
+		| 
+		A:a COMMA E:e
+		{:RESULT = new SyntaxNode(Code.COMMA, a, e);:}
+	;
+		
+D ::= 	
+		ID:i PARANTHESIS_OPEN V:v PARANTHESIS_CLOSE BRACE_OPEN E:e BRACE_CLOSE
+		{:RESULT = new SyntaxNode(Code.FUNCTION_DEFINITION, new SyntaxNode(Code.ID,i), v, e);:}
+		| 
+		D:d1 D:d2
+		{:RESULT = new SyntaxNode(Code.SEQUENCE, d1, d2);:}
+	;
+		
+V ::= 	
+		ID:i
+		{:RESULT = new SyntaxNode(Code.ID,i);:}
+		| 
+		V:v1 COMMA V:v2
+		{:RESULT = new SyntaxNode(Code.COMMA, v1, v2);:}
+	;
+	
