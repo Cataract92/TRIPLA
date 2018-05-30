@@ -54,46 +54,4 @@ public class SyntaxNode {
     public Object getValue() {
         return value;
     }
-
-    /*
-    public String toJson()
-    {
-        return toJson(0);
-    }
-
-    private String toJson(int depth)
-    {
-        StringBuilder output = new StringBuilder();
-        for (int i = 0; i < depth; i++)
-            output.append("\t");
-
-        output.append(synCode);
-
-        if (value != null) {
-            output.append(": ").append(value);
-        }
-
-        if (!nodes.isEmpty()) {
-            output.append("\n");
-
-            for (int i = 0; i < depth; i++)
-                output.append("\t");
-
-            output.append("{\n");
-
-            for (SyntaxNode node : nodes) {
-                output.append(node.toJson(depth + 1));
-            }
-
-            for (int i = 0; i < depth; i++)
-                output.append("\t");
-
-            output.append("}");
-        }
-        output.append("\n");
-
-        return output.toString();
-
-    }
-    */
 }
