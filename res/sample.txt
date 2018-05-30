@@ -1,7 +1,1 @@
-let func(a,b) {
-        do {
-          b = b + 1;
-          a = a - 1
-        } while ( a > 0 && b != a )
-    }
-in func(10, 8)
+3+3*4

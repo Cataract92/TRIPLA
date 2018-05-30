@@ -174,12 +174,6 @@ C ::=   BOOL:b
         E:e1 OP_NEQ E:e2
         {:RESULT = new SyntaxNode(Code.OP_NEQ, null,e1,e2);:}
         |
-        C:c1 OP_EQ C:c2
-        {:RESULT = new SyntaxNode(Code.OP_EQ, null,c1,c2);:}
-        |
-        C:c1 OP_NEQ C:c2
-        {:RESULT = new SyntaxNode(Code.OP_NEQ, null,c1,c2);:}
-        |
         C:c1 OP_AND C:c2
         {:RESULT = new SyntaxNode(Code.OP_AND, null,c1,c2);:}
         |
