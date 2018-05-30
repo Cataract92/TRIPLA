@@ -1,4 +1,7 @@
-let func(a,b,c,d) {
-        a = 2*b+3;y=5
+let func(a,b) {
+        do {
+          b = b + 1;
+          a = a - 1
+        } while ( a > 0 && b != a )
     }
 in func(10, 8)

@@ -2,71 +2,89 @@
 
 <!-- Nico Feld - 1169233 -->
 
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name = "TRAM" basedir = "." default = "build" >
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name = "TRIPLA" basedir = "." default = "build" >
     <property name = "src.dir" value = "src"/>
     <property name = "build.dir" value = "${basedir}/META-INF/classes"/>
-    <property name = "name" value = "TRAM"/>
+    <property name = "name" value = "TRIPLA"/>
 
     <path id = "master-classpath">
         <pathelement path = "${build.dir}"/>
     </path>
 
-
-    <property name="ivy.install.version" value="2.1.0-rc2" />
-    <condition property="ivy.home" value="${env.IVY_HOME}">
-        <isset property="env.IVY_HOME" />
-    </condition>
-    <property name="ivy.home" value="${user.home}/.ant" />
-    <property name="ivy.jar.dir" value="${ivy.home}/lib" />
-    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
-
-    <target name="download-ivy" unless="offline">
-
-        <mkdir dir="${ivy.jar.dir}"/>
-        <!-- download Ivy from web site so that it can be used even without any special installation -->
-        <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
-             dest="${ivy.jar.file}" usetimestamp="true"/>
-    </target>
-
-    <target name="init-ivy" depends="download-ivy">
-        <!-- try to load ivy here from ivy home, in case the user has not already dropped
-                it into ant's lib dir (note that the latter copy will always take precedence).
-                We will not fail as long as local lib dir exists (it may be empty) and
-                ivy is in at least one of ant's lib dir or the local lib dir. -->
-        <path id="ivy.lib.path">
-            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-
-        </path>
-        <taskdef resource="org/apache/ivy/ant/antlib.xml"
-                 uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
-    </target>
-
-    <target name = "build" description = "Compile source tree fst files" depends="clean">
+    <target name = "build" description = "Compile source tripla files">
         <ivy:retrieve/>
+
+        <mkdir dir = "${build.dir}"/>
+
+        <taskdef classname="jflex.anttask.JFlexTask" name="jflex"
+                 classpath="lib/jflex-1.6.1.jar" />
+
+        <taskdef name="cup"
+                 classname="java_cup.anttask.CUPTask"
+                 classpath="lib/java-cup-11b-2015.03.26.jar"/>
+
+        <jflex
+                file="res/tripla.flex"
+                destdir="src/"/>
+
+        <cup srcfile="res/tripla.cup"
+             package="cup"
+             parser="Parser"
+             symbols="Symbols"
+             destdir="src/cup"
+             />
+
+        <javac destdir = "${build.dir}" source = "1.8" target = "1.8" includeantruntime="false" >
+            <src path = "${src.dir}"/>
+            <classpath>
+                <pathelement path="${basedir}/lib/java-cup-11b-2015.03.26.jar"/>
+                <pathelement path="${basedir}/lib/jflex-1.6.1.jar"/>
+                <pathelement path="${basedir}/lib/jackson-annotations-2.9.0.jar"/>
+                <pathelement path="${basedir}/lib/jackson-core-2.9.5.jar"/>
+                <pathelement path="${basedir}/lib/jackson-databind-2.9.5.jar"/>
+            </classpath>
+        </javac>
 
     </target>
 
     <target name="jar" depends="build">
         <jar destfile="${basedir}/${ant.project.name}.jar" basedir="${build.dir}">
-            <zipgroupfileset dir="lib" includes="log4j-1.2.17.jar"/>
+            <zipgroupfileset dir="lib" includes="java-cup-11b-2015.03.26.jar"/>
+            <zipgroupfileset dir="lib" includes="jflex-1.6.1.jar"/>
+            <zipgroupfileset dir="lib" includes="jackson-annotations-2.9.0.jar"/>
+            <zipgroupfileset dir="lib" includes="jackson-core-2.9.5.jar"/>
+            <zipgroupfileset dir="lib" includes="jackson-databind-2.9.5.jar"/>
             <manifest>
-                <attribute name="Main-Class" value="de.unitrier.st.uap.s18.tram.Main"/>
+                <attribute name="Main-Class" value="Main"/>
             </manifest>
         </jar>
     </target>
 
     <target name = "run" depends="jar">
-        <java jar="${basedir}/${ant.project.name}.jar" fork="true"/>
+        <java jar="${basedir}/${ant.project.name}.jar" fork="true">
+            <arg value="res/sample.txt"/>
+            <arg value="tree.json"/>
+        </java>
     </target>
 
     <target name = "clean" description = "Clean output directories">
         <ivy:cleancache/>
         <delete includeemptydirs="true">
             <fileset dir = "${basedir}" defaultexcludes="false" includes="**/META-INF/"/>
-        </delete>
-        <delete>
             <fileset dir = "${basedir}" includes="${ant.project.name}.jar"/>
-        </delete>
+            <fileset dir = "${basedir}" includes="tree.json"/>
+            <fileset dir="${basedir}/src/flex">
+                <exclude name=".gitkeep"/>
+                <include name="*"/>
+            </fileset>
+            <fileset dir="${basedir}/src/cup">
+                <exclude name=".gitkeep"/>
+                <include name="*"/>
+            </fileset>
+            <fileset dir="${basedir}/lib">
+                <include name="*"/>
+            </fileset>
 
+        </delete>
     </target>
 </project>

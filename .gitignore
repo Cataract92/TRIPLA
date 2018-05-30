@@ -27,3 +27,6 @@ hs_err_pid*
 Lexer.java
 Parser.java
 Symbols.java
+tree.json
+META-INF/
+lib/

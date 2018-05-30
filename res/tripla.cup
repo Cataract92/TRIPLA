@@ -58,20 +58,23 @@ parser code {:
 :};
 
 /* Terminals (tokens returned by the scanner). */
-terminal Symbol LET, IN, IF, THEN, ELSE;
+terminal Symbol LET, IN, IF, THEN, ELSE, DO, WHILE;
 terminal Symbol ASSIGN, PARANTHESIS_OPEN, PARANTHESIS_CLOSE, BRACE_OPEN, BRACE_CLOSE, COMMA, SEMICOLON;
-terminal Symbol OP_PLUS, OP_MINUS, OP_MUL, OP_DIV, OP_EQ, OP_NEQ, OP_GT, OP_LT;
+terminal Symbol OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_EQ, OP_NEQ, OP_GT, OP_LT, OP_GTE, OP_LTE, OP_AND, OP_OR;
 terminal String ID; 
 terminal Integer CONST;
+terminal Boolean BOOL;
 
 /* Non terminals */
-non terminal SyntaxNode E, D, A, V;
+non terminal SyntaxNode E, D, A, V, C;
 
 /* Precedences  */
 precedence left COMMA, SEMICOLON, ID;
 precedence left ASSIGN;
-precedence left OP_EQ, OP_NEQ, OP_LT, OP_GT;
-precedence left OP_PLUS, OP_MINUS;
+precedence left OP_OR;
+precedence left OP_AND;
+precedence left OP_EQ, OP_NEQ, OP_LT, OP_GT, OP_GTE, OP_LTE;
+precedence left OP_ADD, OP_SUB;
 precedence left OP_MUL, OP_DIV;
 
 
@@ -80,52 +83,46 @@ start with E;
 
 E ::=
 		LET D:d IN E:e
-		{:RESULT = new SyntaxNode(Code.LET_IN, d, e);:}
+		{:RESULT = new SyntaxNode(Code.LET_IN, null, d, e);:}
 		| 
 		ID:i
 		{:RESULT = new SyntaxNode(Code.ID,i);:}
 		| 
 		ID:i PARANTHESIS_OPEN A:a PARANTHESIS_CLOSE
-		{:RESULT = new SyntaxNode(Code.FUNCTION, new SyntaxNode(Code.ID,i), a);:}
+		{:RESULT = new SyntaxNode(Code.FUNCTION_CALL, null, new SyntaxNode(Code.ID,i), a);:}
 		| 
 		E:e1 OP_MUL E:e2
-		{:RESULT = new SyntaxNode(Code.OP_MUL, e1, e2);:}
+		{:RESULT = new SyntaxNode(Code.OP_MUL, null, e1, e2);:}
 		| 
 		E:e1 OP_DIV E:e2
-		{:RESULT = new SyntaxNode(Code.OP_DIV, e1, e2);:}
+		{:RESULT = new SyntaxNode(Code.OP_DIV, null, e1, e2);:}
 		| 
-		E:e1 OP_PLUS E:e2
-		{:RESULT = new SyntaxNode(Code.OP_PLUS, e1, e2);:}
+		E:e1 OP_ADD E:e2
+		{:RESULT = new SyntaxNode(Code.OP_ADD, null, e1, e2);:}
 		| 
-		E:e1 OP_MINUS E:e2
-		{:RESULT = new SyntaxNode(Code.OP_MINUS, e1, e2);:}
-		| 
-		E:e1 OP_EQ E:e2
-		{:RESULT = new SyntaxNode(Code.OP_EQ, e1, e2);:}
-		| 
-		E:e1 OP_NEQ E:e2
-		{:RESULT = new SyntaxNode(Code.OP_NEQ, e1, e2);:}
-		| 
-		E:e1 OP_GT E:e2
-		{:RESULT = new SyntaxNode(Code.OP_GT, e1, e2);:}
-		| 
-		E:e1 OP_LT E:e2
-		{:RESULT = new SyntaxNode(Code.OP_LT, e1, e2);:}
-		| 
+		E:e1 OP_SUB E:e2
+		{:RESULT = new SyntaxNode(Code.OP_SUB, null, e1, e2);:}
+		|
 		PARANTHESIS_OPEN E:e PARANTHESIS_CLOSE
-		{:RESULT = new SyntaxNode(Code.PARENTHESES, e);:}
+		{:RESULT = new SyntaxNode(Code.PARENTHESES, null, e);:}
 		| 
 		CONST:c
 		{:RESULT = new SyntaxNode(Code.CONST,c);:}
 		| 
 		ID:i ASSIGN E:e
-		{:RESULT = new SyntaxNode(Code.ASSIGN, new SyntaxNode(Code.ID,i), e);:}
+		{:RESULT = new SyntaxNode(Code.ASSIGN, null, new SyntaxNode(Code.ID,i), e);:}
 		| 
 		E:e1 SEMICOLON E:e2
-		{:RESULT = new SyntaxNode(Code.SEMICOLON, e1, e2);:}
+		{:RESULT = new SyntaxNode(Code.SEMICOLON, null, e1, e2);:}
 		| 
-		IF E:e1 THEN E:e2 ELSE E:e3
-		{:RESULT = new SyntaxNode(Code.IF_THEN_ELSE, e1, e2, e3);:}
+		IF C:c THEN E:e1 ELSE E:e2
+		{:RESULT = new SyntaxNode(Code.IF_THEN_ELSE, null, c, e1, e2);:}
+		|
+        DO E:e WHILE C:c
+        {:RESULT = new SyntaxNode(Code.DO_WHILE, null, e, c);:}
+        |
+        BRACE_OPEN E:e BRACE_CLOSE
+        {:RESULT = e;:}
 	;
 		
 A ::= 
@@ -133,15 +130,15 @@ A ::=
 		{:RESULT = e;:}
 		| 
 		A:a COMMA E:e
-		{:RESULT = new SyntaxNode(Code.COMMA, a, e);:}
+		{:RESULT = new SyntaxNode(Code.COMMA, null, a, e);:}
 	;
 		
 D ::= 	
 		ID:i PARANTHESIS_OPEN V:v PARANTHESIS_CLOSE BRACE_OPEN E:e BRACE_CLOSE
-		{:RESULT = new SyntaxNode(Code.FUNCTION_DEFINITION, new SyntaxNode(Code.ID,i), v, e);:}
+		{:RESULT = new SyntaxNode(Code.FUNCTION_DEFINITION, null, new SyntaxNode(Code.ID,i), v, e);:}
 		| 
 		D:d1 D:d2
-		{:RESULT = new SyntaxNode(Code.SEQUENCE, d1, d2);:}
+		{:RESULT = new SyntaxNode(Code.SEQUENCE, null, d1, d2);:}
 	;
 		
 V ::= 	
@@ -149,6 +146,42 @@ V ::=
 		{:RESULT = new SyntaxNode(Code.ID,i);:}
 		| 
 		V:v1 COMMA V:v2
-		{:RESULT = new SyntaxNode(Code.COMMA, v1, v2);:}
+		{:RESULT = new SyntaxNode(Code.COMMA, null, v1, v2);:}
 	;
-	
+
+C ::=   BOOL:b
+        {:RESULT = new SyntaxNode(Code.BOOL,b);:}
+        |
+        E:e1 OP_GT E:e2
+        {:RESULT = new SyntaxNode(Code.OP_GT, null,e1,e2);:}
+        |
+        E:e1 OP_LT E:e2
+        {:RESULT = new SyntaxNode(Code.OP_LT, null,e1,e2);:}
+        |
+        E:e1 OP_GTE E:e2
+        {:RESULT = new SyntaxNode(Code.OP_GTE, null,e1,e2);:}
+        |
+        E:e1 OP_LTE E:e2
+        {:RESULT = new SyntaxNode(Code.OP_LTE, null,e1,e2);:}
+        |
+        E:e1 OP_EQ E:e2
+        {:RESULT = new SyntaxNode(Code.OP_EQ, null,e1,e2);:}
+        |
+        E:e1 OP_NEQ E:e2
+        {:RESULT = new SyntaxNode(Code.OP_NEQ, null,e1,e2);:}
+        |
+        C:c1 OP_EQ C:c2
+        {:RESULT = new SyntaxNode(Code.OP_EQ, null,c1,c2);:}
+        |
+        C:c1 OP_NEQ C:c2
+        {:RESULT = new SyntaxNode(Code.OP_NEQ, null,c1,c2);:}
+        |
+        C:c1 OP_AND C:c2
+        {:RESULT = new SyntaxNode(Code.OP_AND, null,c1,c2);:}
+        |
+        C:c1 OP_OR C:c2
+        {:RESULT = new SyntaxNode(Code.OP_OR, null,c1,c2);:}
+        |
+        PARANTHESIS_OPEN C:c PARANTHESIS_CLOSE
+        {:RESULT = new SyntaxNode(Code.PARENTHESES, null,c);:}
+	;
