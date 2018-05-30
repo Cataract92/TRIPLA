@@ -1,3 +1,7 @@
+/*
+ * Nico Feld - 1169233
+ */
+
 package tripla;
 
 public enum Code {

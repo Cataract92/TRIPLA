@@ -1,41 +1,33 @@
+/*
+ * Nico Feld - 1169233
+ */
+
 package tripla;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SyntaxNode {
-	/* Variables */
-	private Code synCode;
-	private ArrayList<SyntaxNode> nodes = new ArrayList<>();
-	private Object value;
 
-	//Knoten f?r 3 Kinder
-	public SyntaxNode(Code synCode, Object obj, SyntaxNode...nodeList){
-		this.synCode=synCode;
-		this.nodes.addAll(Arrays.asList(nodeList));
-		this.value=obj;
-	}
-	
-	public String getTab(int numberOfTabs){
-		String tabString = "";
-		for(int i=1;i<=numberOfTabs;i++){
-			tabString+="\t";
-		}
-		
-		return tabString;
-	}
+    private Code synCode;
+    private ArrayList<SyntaxNode> nodes = new ArrayList<>();
+    private Object value;
 
-	public void toFile(String json) throws IOException {
+    public SyntaxNode(Code synCode, Object obj, SyntaxNode... nodeList) {
+        this.synCode = synCode;
+        this.nodes.addAll(Arrays.asList(nodeList));
+        this.value = obj;
+    }
+
+    public void toFile(String json) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
@@ -49,7 +41,7 @@ public class SyntaxNode {
         mapper.setDefaultPrettyPrinter(printer);
 
         Files.write(Paths.get(json), mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this).getBytes());
-	}
+    }
 
     public Code getSynCode() {
         return synCode;

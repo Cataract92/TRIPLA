@@ -2,22 +2,22 @@
 
 <!-- Nico Feld - 1169233 -->
 
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name = "TRIPLA" basedir = "." default = "build" >
-    <property name = "src.dir" value = "src"/>
-    <property name = "build.dir" value = "${basedir}/META-INF/classes"/>
-    <property name = "name" value = "TRIPLA"/>
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="TRIPLA" basedir="." default="build">
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="${basedir}/META-INF/classes"/>
+    <property name="name" value="TRIPLA"/>
 
-    <path id = "master-classpath">
-        <pathelement path = "${build.dir}"/>
+    <path id="master-classpath">
+        <pathelement path="${build.dir}"/>
     </path>
 
-    <target name = "build" description = "Compile source tripla files">
+    <target name="build" description="Compile source tripla files">
         <ivy:retrieve/>
 
-        <mkdir dir = "${build.dir}"/>
+        <mkdir dir="${build.dir}"/>
 
         <taskdef classname="jflex.anttask.JFlexTask" name="jflex"
-                 classpath="lib/jflex-1.6.1.jar" />
+                 classpath="lib/jflex-1.6.1.jar"/>
 
         <taskdef name="cup"
                  classname="java_cup.anttask.CUPTask"
@@ -32,10 +32,10 @@
              parser="Parser"
              symbols="Symbols"
              destdir="src/cup"
-             />
+        />
 
-        <javac destdir = "${build.dir}" source = "1.8" target = "1.8" includeantruntime="false" >
-            <src path = "${src.dir}"/>
+        <javac destdir="${build.dir}" source="1.8" target="1.8" includeantruntime="false">
+            <src path="${src.dir}"/>
             <classpath>
                 <pathelement path="${basedir}/lib/java-cup-11b-2015.03.26.jar"/>
                 <pathelement path="${basedir}/lib/jflex-1.6.1.jar"/>
@@ -60,19 +60,19 @@
         </jar>
     </target>
 
-    <target name = "run" depends="jar">
+    <target name="run" depends="jar">
         <java jar="${basedir}/${ant.project.name}.jar" fork="true">
             <arg value="res/sample.txt"/>
             <arg value="tree.json"/>
         </java>
     </target>
 
-    <target name = "clean" description = "Clean output directories">
+    <target name="clean" description="Clean output directories">
         <ivy:cleancache/>
         <delete includeemptydirs="true">
-            <fileset dir = "${basedir}" defaultexcludes="false" includes="**/META-INF/"/>
-            <fileset dir = "${basedir}" includes="${ant.project.name}.jar"/>
-            <fileset dir = "${basedir}" includes="tree.json"/>
+            <fileset dir="${basedir}" defaultexcludes="false" includes="**/META-INF/"/>
+            <fileset dir="${basedir}" includes="${ant.project.name}.jar"/>
+            <fileset dir="${basedir}" includes="tree.json"/>
             <fileset dir="${basedir}/src/flex">
                 <exclude name=".gitkeep"/>
                 <include name="*"/>
@@ -82,6 +82,7 @@
                 <include name="*"/>
             </fileset>
             <fileset dir="${basedir}/lib">
+                <exclude name=".gitkeep"/>
                 <include name="*"/>
             </fileset>
 

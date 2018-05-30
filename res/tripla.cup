@@ -1,3 +1,7 @@
+/*
+ * Nico Feld - 1169233
+ */
+
 import java_cup.runtime.*;
 import tripla.*;
 
@@ -104,7 +108,7 @@ E ::=
 		{:RESULT = new SyntaxNode(Code.OP_SUB, null, e1, e2);:}
 		|
 		PARANTHESIS_OPEN E:e PARANTHESIS_CLOSE
-		{:RESULT = new SyntaxNode(Code.PARENTHESES, null, e);:}
+		{:RESULT = e;:}
 		| 
 		CONST:c
 		{:RESULT = new SyntaxNode(Code.CONST,c);:}
@@ -183,5 +187,5 @@ C ::=   BOOL:b
         {:RESULT = new SyntaxNode(Code.OP_OR, null,c1,c2);:}
         |
         PARANTHESIS_OPEN C:c PARANTHESIS_CLOSE
-        {:RESULT = new SyntaxNode(Code.PARENTHESES, null,c);:}
+        {:RESULT = c;:}
 	;
