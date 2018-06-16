@@ -4,6 +4,7 @@
 
 package tripla;
 
+import CodeGenerator.AddressPair;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 public class SyntaxNode {
 
@@ -26,6 +28,8 @@ public class SyntaxNode {
         this.nodes.addAll(Arrays.asList(nodeList));
         this.value = obj;
     }
+
+
 
     public void toFile(String json) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -41,6 +45,11 @@ public class SyntaxNode {
         mapper.setDefaultPrettyPrinter(printer);
 
         Files.write(Paths.get(json), mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this).getBytes());
+    }
+
+    private Map<String,AddressPair> elab_def(Map<String,AddressPair> rho, int nl)
+    {
+
     }
 
     public Code getSynCode() {
