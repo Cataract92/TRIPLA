@@ -10,6 +10,7 @@ public class Instruction {
     private Integer arg1;
     private Integer arg2;
     private Integer arg3;
+    private Label label = null;
 
     public final static int CONST = 1;
     public final static int LOAD = 2;
@@ -28,6 +29,11 @@ public class Instruction {
     public final static int NOP = 15;
     public final static int INVOKE = 16;
     public final static int RETURN = 17;
+    public final static int POP = 18;
+    public final static int AND = 19;
+    public final static int OR = 20;
+    public final static int GTE = 21;
+    public final static int LTE = 22;
 
 
     public Instruction(int opcode, Integer arg1, Integer arg2, Integer arg3) {
@@ -148,6 +154,21 @@ public class Instruction {
                 break;
             case Instruction.RETURN:
                 retStr += "RETURN";
+                break;
+            case Instruction.POP:
+                retStr += "POP";
+                break;
+            case Instruction.AND:
+                retStr += "AND";
+                break;
+            case Instruction.OR:
+                retStr += "OR";
+                break;
+            case Instruction.GTE:
+                retStr += "GTE";
+                break;
+            case Instruction.LTE:
+                retStr += "LTE";
                 break;
             default:
                 retStr += "ERROR";

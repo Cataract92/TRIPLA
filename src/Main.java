@@ -2,11 +2,16 @@
  * Nico Feld - 1169233
  */
 
+import CodeGenerator.AddressPair;
+import CodeGenerator.Instruction;
+import CodeGenerator.Label;
 import cup.Parser;
 import flex.Lexer;
 import tripla.SyntaxNode;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main {
     public static void main(String argv[]) {
@@ -23,6 +28,15 @@ public class Main {
             SyntaxNode result = ((SyntaxNode) p.parse().value);
 
             result.toFile(argv[1]);
+
+            ArrayList<Instruction> code = result.code(new HashMap<>(),0);
+
+            Label.replaceLabels(code);
+
+            for (Instruction instruction : code)
+            {
+                System.out.println(instruction.toString());
+            }
 
             System.out.println("Output: " + argv[1]);
         } catch (Exception e) {

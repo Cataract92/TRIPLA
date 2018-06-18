@@ -1,1 +1,15 @@
-3+3*4
+let m(x,y)
+{
+    if (x == 0) then
+        y*2
+    else
+        let n(x,z){
+            x - y * z
+        } in n(2 + x, y)
+} n (z, w) {
+    do {
+        w = w * m(z,w);
+        z = z - 1
+    } while (z > 0);
+    w
+} in m(2,3); n(3,2)

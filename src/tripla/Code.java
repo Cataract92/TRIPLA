@@ -29,5 +29,5 @@ public enum Code {
     ID,
     CONST,
     FUNCTION_CALL,
-    FUNCTION_DEFINITION,
+    FUNCTION_DEFINITION
 }

@@ -71,6 +71,7 @@
         <ivy:cleancache/>
         <delete includeemptydirs="true">
             <fileset dir="${basedir}" defaultexcludes="false" includes="**/META-INF/"/>
+            <fileset dir="${basedir}" defaultexcludes="false" includes="**/lib/"/>
             <fileset dir="${basedir}" includes="${ant.project.name}.jar"/>
             <fileset dir="${basedir}" includes="tree.json"/>
             <fileset dir="${basedir}/src/flex">
@@ -81,11 +82,6 @@
                 <exclude name=".gitkeep"/>
                 <include name="*"/>
             </fileset>
-            <fileset dir="${basedir}/lib">
-                <exclude name=".gitkeep"/>
-                <include name="*"/>
-            </fileset>
-
         </delete>
     </target>
 </project>
