@@ -6,5 +6,6 @@
         <dependency org="de.jflex" name="jflex" rev="1.6.1"/>
         <dependency org="nz.ac.waikato.cms.weka.thirdparty" name="java-cup-11b" rev="2015.03.26"/>
         <dependency org="com.fasterxml.jackson.core" name="jackson-databind" rev="2.9.5"/>
+        <dependency org="jgrapht" name="jgrapht" rev="0.7.3"/>
     </dependencies>
 </ivy-module>

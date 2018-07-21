@@ -42,6 +42,7 @@
                 <pathelement path="${basedir}/lib/jackson-annotations-2.9.0.jar"/>
                 <pathelement path="${basedir}/lib/jackson-core-2.9.5.jar"/>
                 <pathelement path="${basedir}/lib/jackson-databind-2.9.5.jar"/>
+                <pathelement path="${basedir}/lib/jgrapht-jdk1.5-0.7.3.jar" />
             </classpath>
         </javac>
 
@@ -54,6 +55,7 @@
             <zipgroupfileset dir="lib" includes="jackson-annotations-2.9.0.jar"/>
             <zipgroupfileset dir="lib" includes="jackson-core-2.9.5.jar"/>
             <zipgroupfileset dir="lib" includes="jackson-databind-2.9.5.jar"/>
+            <zipgroupfileset dir="lib" includes="jgrapht-jdk1.5-0.7.3.jar"/>
             <manifest>
                 <attribute name="Main-Class" value="Main"/>
             </manifest>

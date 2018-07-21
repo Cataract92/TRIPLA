@@ -2,11 +2,12 @@
  * Nico Feld - 1169233
  */
 
-import CodeGenerator.AddressPair;
 import CodeGenerator.Instruction;
 import CodeGenerator.Label;
 import cup.Parser;
 import flex.Lexer;
+import tripla.Code;
+import tripla.SyntaxTreeManager;
 import tripla.SyntaxNode;
 
 import java.io.*;
@@ -20,17 +21,17 @@ public class Main {
             return;
         }
 
-
         try {
             Reader input = new FileReader(argv[0]);
             Parser p = new Parser(new Lexer(input));
 
             SyntaxNode result = ((SyntaxNode) p.parse().value);
 
-            result.toFile(argv[1]);
+            SyntaxTreeManager stm = SyntaxTreeManager.getInstance();
+            stm.optimizeTree(result);
+            stm.toFile(result,argv[1]);
 
             ArrayList<Instruction> code = result.code(new HashMap<>(),0);
-
             Label.replaceLabels(code);
 
             for (Instruction instruction : code)

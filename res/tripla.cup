@@ -64,7 +64,7 @@ parser code {:
 /* Terminals (tokens returned by the scanner). */
 terminal Symbol LET, IN, IF, THEN, ELSE, DO, WHILE;
 terminal Symbol ASSIGN, PARANTHESIS_OPEN, PARANTHESIS_CLOSE, BRACE_OPEN, BRACE_CLOSE, COMMA, SEMICOLON;
-terminal Symbol OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_EQ, OP_NEQ, OP_GT, OP_LT, OP_GTE, OP_LTE, OP_AND, OP_OR;
+terminal Symbol OP_ADD, OP_SUB, OP_MULT, OP_DIV, OP_EQ, OP_NEQ, OP_GT, OP_LT, OP_GTE, OP_LTE, OP_AND, OP_OR;
 terminal String ID; 
 terminal Integer CONST;
 terminal Boolean BOOL;
@@ -79,7 +79,7 @@ precedence left OP_OR;
 precedence left OP_AND;
 precedence left OP_EQ, OP_NEQ, OP_LT, OP_GT, OP_GTE, OP_LTE;
 precedence left OP_ADD, OP_SUB;
-precedence left OP_MUL, OP_DIV;
+precedence left OP_MULT, OP_DIV;
 
 
 /* The grammar */
@@ -95,8 +95,8 @@ E ::=
 		ID:i PARANTHESIS_OPEN A:a PARANTHESIS_CLOSE
 		{:RESULT = new SyntaxNode(Code.FUNCTION_CALL, null, new SyntaxNode(Code.ID,i), a);:}
 		| 
-		E:e1 OP_MUL E:e2
-		{:RESULT = new SyntaxNode(Code.OP_MUL, null, e1, e2);:}
+		E:e1 OP_MULT E:e2
+		{:RESULT = new SyntaxNode(Code.OP_MULT, null, e1, e2);:}
 		| 
 		E:e1 OP_DIV E:e2
 		{:RESULT = new SyntaxNode(Code.OP_DIV, null, e1, e2);:}

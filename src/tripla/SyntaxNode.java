@@ -11,16 +11,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.deploy.util.ArrayUtil;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 public class SyntaxNode {
 
@@ -28,32 +25,16 @@ public class SyntaxNode {
     private ArrayList<SyntaxNode> nodes = new ArrayList<>();
     private Object value;
 
+    private SyntaxTreeManager syntaxTreeManager;
+
     public SyntaxNode(Code synCode, Object obj, SyntaxNode... nodeList) {
         this.synCode = synCode;
         this.nodes.addAll(Arrays.asList(nodeList));
         this.value = obj;
+        syntaxTreeManager = SyntaxTreeManager.getInstance();
     }
-
-
-    public void toFile(String json) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-
-        DefaultPrettyPrinter.Indenter indenter =
-                new DefaultIndenter("   ", DefaultIndenter.SYS_LF);
-        DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
-        printer.indentObjectsWith(indenter);
-        printer.indentArraysWith(indenter);
-
-        mapper.setDefaultPrettyPrinter(printer);
-
-        Files.write(Paths.get(json), mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this).getBytes());
-    }
-
 
     private void elab_def(HashMap<String, AddressPair> rho, int nl) {
-
 
         switch (synCode){
 
@@ -66,15 +47,16 @@ public class SyntaxNode {
 
             case SEQUENCE:
             {
-                getNodes().get(1).elab_def(rho, nl);
-                getNodes().get(0).elab_def(rho,nl);
+                for (SyntaxNode node: getNodes())
+                {
+                    node.elab_def(rho, nl);
+                }
                 break;
             }
 
         }
 
     }
-
 
     public ArrayList<Instruction> code(HashMap<String, AddressPair> rho, int nl) {
         ArrayList<Instruction> instructions = new ArrayList<>();
@@ -97,8 +79,10 @@ public class SyntaxNode {
             }
 
             case COMMA: {
-                instructions.addAll(nodes.get(0).code(rho, nl));
-                instructions.addAll(nodes.get(1).code(rho, nl));
+                for (SyntaxNode node: nodes)
+                {
+                    instructions.addAll(node.code(rho,nl));
+                }
                 break;
             }
 
@@ -129,9 +113,32 @@ public class SyntaxNode {
             }
 
             case OP_OR: {
+                Label l1 = new Label();
+                Label l2 = new Label();
+
                 instructions.addAll(nodes.get(0).code(rho,nl));
                 instructions.addAll(nodes.get(1).code(rho,nl));
-                instructions.add(new Instruction(Instruction.OR));
+
+                instructions.add(new Instruction(Instruction.ADD));
+
+                Instruction ifzero = new Instruction(Instruction.IFZERO,-1);
+                l1.addInstruction(ifzero);
+                instructions.add(ifzero);
+
+                instructions.add(new Instruction(Instruction.CONST,1));
+
+                Instruction gTo = new Instruction(Instruction.GOTO,-1);
+                l2.addInstruction(gTo);
+                instructions.add(gTo);
+
+                Instruction const0 = new Instruction(Instruction.CONST,0);
+                l1.setLabeledInstruction(const0);
+                instructions.add(const0);
+
+                Instruction nop = new Instruction(Instruction.NOP);
+                l2.setLabeledInstruction(nop);
+                instructions.add(nop);
+
                 break;
             }
 
@@ -141,7 +148,7 @@ public class SyntaxNode {
 
                 instructions.addAll(nodes.get(0).code(rho, nl));
 
-                Instruction ifzero = new Instruction(Instruction.IFZERO);
+                Instruction ifzero = new Instruction(Instruction.IFZERO,-1);
                 l1.addInstruction(ifzero);
                 instructions.add(ifzero);
 
@@ -176,6 +183,8 @@ public class SyntaxNode {
                 Instruction ifzero = new Instruction(Instruction.IFZERO);
                 l2.addInstruction(ifzero);
                 instructions.add(ifzero);
+
+                instructions.add(new Instruction(Instruction.POP));
 
                 Instruction gTo = new Instruction(Instruction.GOTO,-1);
                 l1.addInstruction(gTo);
@@ -224,7 +233,7 @@ public class SyntaxNode {
             case OP_AND: {
                 instructions.addAll(nodes.get(0).code(rho,nl));
                 instructions.addAll(nodes.get(1).code(rho,nl));
-                instructions.add(new Instruction(Instruction.AND));
+                instructions.add(new Instruction(Instruction.MULT));
                 break;
             }
 
@@ -234,15 +243,18 @@ public class SyntaxNode {
             }
 
             case SEQUENCE: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                for (SyntaxNode node : nodes)
+                    instructions.addAll(node.code(rho,nl));
                 break;
             }
 
             case SEMICOLON: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.add(new Instruction(Instruction.POP));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+
+                for (SyntaxNode node : nodes) {
+                    instructions.addAll(node.code(rho, nl));
+                    instructions.add(new Instruction(Instruction.POP));
+                }
+                instructions.remove(instructions.size()-1); // Remove last pop
                 break;
             }
 
@@ -253,10 +265,10 @@ public class SyntaxNode {
                 break;
             }
 
-            case OP_MUL: {
+            case OP_MULT: {
                 instructions.addAll(nodes.get(0).code(rho,nl));
                 instructions.addAll(nodes.get(1).code(rho,nl));
-                instructions.add(new Instruction(Instruction.MUL));
+                instructions.add(new Instruction(Instruction.MULT));
                 break;
             }
 
@@ -293,65 +305,34 @@ public class SyntaxNode {
 
                 AddressPair pair = rho.get(nodes.get(0).value);
 
-                Instruction invoke = new Instruction(Instruction.INVOKE,nodes.get(1).countComma()+1,-1,nl-pair.getNl());
+                Instruction invoke = new Instruction(Instruction.INVOKE,syntaxTreeManager.countComma(nodes.get(1))+1,-1,nl-pair.getNl());
                 ((Label) pair.getLoc()).addInstruction(invoke);
                 instructions.add(invoke);
                 break;
             }
 
             case FUNCTION_DEFINITION: {
-                HashMap<String ,AddressPair> map = new HashMap<>(rho);
 
-                ArrayList<String> allIds = nodes.get(1).getAllIDs();
+                    HashMap<String ,AddressPair> map = new HashMap<>(rho);
 
-                for (int i = 0; i < allIds.size(); i++)
-                {
-                    map.put(allIds.get(i),new AddressPair(i,nl+1));
-                }
+                    ArrayList<String> allIds = syntaxTreeManager.getAllIDs(nodes.get(1));
 
-                ArrayList<Instruction> code_e = nodes.get(2).code(map,nl+1);
-                Label l = (Label) map.get(nodes.get(0).value).getLoc();
-                l.setLabeledInstruction(code_e.get(0));
-                instructions.addAll(code_e);
+                    for (int i = 0; i < allIds.size(); i++)
+                    {
+                        map.put(allIds.get(i),new AddressPair(i,nl+1));
+                    }
 
-                instructions.add(new Instruction(Instruction.RETURN));
+                    ArrayList<Instruction> code_e = nodes.get(2).code(map,nl+1);
+                    Label l = (Label) map.get(nodes.get(0).value).getLoc();
+                    l.setLabeledInstruction(code_e.get(0));
+                    instructions.addAll(code_e);
 
+                    instructions.add(new Instruction(Instruction.RETURN));
                 break;
             }
         }
 
         return instructions;
-    }
-
-    private ArrayList<String> getAllIDs()
-    {
-        ArrayList<String> list = new ArrayList<>();
-
-        if (synCode == Code.ID)
-        {
-            list.add((String)value);
-        } else if (synCode == Code.COMMA)
-        {
-            for (SyntaxNode n : nodes)
-            {
-                list.addAll(n.getAllIDs());
-            }
-        }
-        return list;
-    }
-
-    private int countComma()
-    {
-        int count = 0;
-        if (synCode == Code.COMMA)
-        {
-            count++;
-            for (SyntaxNode n : nodes)
-            {
-                count += n.countComma();
-            }
-        }
-        return count;
     }
 
     public Code getSynCode() {
@@ -360,6 +341,10 @@ public class SyntaxNode {
 
     public ArrayList<SyntaxNode> getNodes() {
         return nodes;
+    }
+
+    public void setNodes(ArrayList<SyntaxNode> nodes) {
+        this.nodes = nodes;
     }
 
     public Object getValue() {
