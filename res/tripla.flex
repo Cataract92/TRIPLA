@@ -62,7 +62,7 @@ Identifier     = [A-Za-z_][A-Za-z0-9_]*
 	/* Operations */
 	"+"				{return new Symbol(Symbols.OP_ADD);}
 	"-"				{return new Symbol(Symbols.OP_SUB);}
-	"*"				{return new Symbol(Symbols.OP_MUL);}
+	"*"				{return new Symbol(Symbols.OP_MULT);}
 	"/"				{return new Symbol(Symbols.OP_DIV);}
 	"=="			{return new Symbol(Symbols.OP_EQ);}
 	"!="			{return new Symbol(Symbols.OP_NEQ);}

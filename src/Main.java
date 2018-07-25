@@ -8,6 +8,7 @@ import CodeGenerator.Label;
 import cup.Parser;
 import flex.Lexer;
 import tripla.SyntaxNode;
+import tripla.SyntaxTreeManager;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -27,7 +28,10 @@ public class Main {
 
             SyntaxNode result = ((SyntaxNode) p.parse().value);
 
-            result.toFile(argv[1]);
+            SyntaxTreeManager stm = SyntaxTreeManager.getInstance();
+
+            stm.optimizeTree(result);
+            stm.toFile(argv[1],result);
 
             ArrayList<Instruction> code = result.code(new HashMap<>(),0);
 

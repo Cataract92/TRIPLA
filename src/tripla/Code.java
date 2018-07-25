@@ -18,7 +18,7 @@ public enum Code {
     OP_OR,
     OP_ADD,
     OP_SUB,
-    OP_MUL,
+    OP_MULT,
     OP_DIV,
     OP_EQ,
     OP_NEQ,

@@ -17,7 +17,7 @@ public class Instruction {
     public final static int STORE = 3;
     public final static int ADD = 4;
     public final static int SUB = 5;
-    public final static int MUL = 6;
+    public final static int MULT = 6;
     public final static int DIV = 7;
     public final static int LT = 8;
     public final static int GT = 9;
@@ -30,8 +30,6 @@ public class Instruction {
     public final static int INVOKE = 16;
     public final static int RETURN = 17;
     public final static int POP = 18;
-    public final static int AND = 19;
-    public final static int OR = 20;
     public final static int GTE = 21;
     public final static int LTE = 22;
 
@@ -119,8 +117,8 @@ public class Instruction {
             case Instruction.SUB:
                 retStr += "SUB";
                 break;
-            case Instruction.MUL:
-                retStr += "MUL";
+            case Instruction.MULT:
+                retStr += "MULT";
                 break;
             case Instruction.DIV:
                 retStr += "DIV";
@@ -157,12 +155,6 @@ public class Instruction {
                 break;
             case Instruction.POP:
                 retStr += "POP";
-                break;
-            case Instruction.AND:
-                retStr += "AND";
-                break;
-            case Instruction.OR:
-                retStr += "OR";
                 break;
             case Instruction.GTE:
                 retStr += "GTE";
