@@ -5,14 +5,42 @@
 package Dataflow;
 
 import org.jgrapht.graph.DefaultDirectedGraph;
+import tripla.SyntaxNode;
 
 public class CFG extends DefaultDirectedGraph<AbstractCFGVertex,LabeledCFGEdge> implements ICFG {
+
+    private class ResultSet<X,Y> {
+        private X x;
+        private Y y;
+
+        public ResultSet(X in, Y out) {
+            this.x = in;
+            this.y = out;
+        }
+
+        public X getIn() {
+            return x;
+        }
+
+        public Y getOut() {
+            return y;
+        }
+    }
 
 
     private AbstractCFGVertex in, out;
 
-    public CFG(Class<? extends LabeledCFGEdge> aClass) {
-        super(aClass);
+    public CFG() {
+        super(LabeledCFGEdge.class);
+    }
+
+    public void build(SyntaxNode root){
+        buildSubGraph(root);
+    }
+
+    private CFGVertex buildSubGraph(SyntaxNode node)
+    {
+        return null;
     }
 
     @Override
