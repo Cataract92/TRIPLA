@@ -1,4 +1,4 @@
 package Dataflow;
 
-public class AbstractCFGExportStrategy {
+public abstract class AbstractCFGExportStrategy {
 }

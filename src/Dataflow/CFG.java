@@ -17,22 +17,22 @@ public class CFG extends DefaultDirectedGraph<AbstractCFGVertex,LabeledCFGEdge> 
 
     @Override
     public AbstractCFGVertex getIn() {
-        return null;
+        return in;
     }
 
     @Override
     public AbstractCFGVertex getOut() {
-        return null;
+        return out;
     }
 
     @Override
     public void setIn(AbstractCFGVertex in) {
-
+        this.in = in;
     }
 
     @Override
     public void setOut(AbstractCFGVertex out) {
-
+        this.out = out;
     }
 
     @Override
