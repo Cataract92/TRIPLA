@@ -25,13 +25,13 @@ public class SyntaxNode {
     private ArrayList<SyntaxNode> nodes = new ArrayList<>();
     private Object value;
 
-    private SyntaxTreeManager syntaxTreeManager;
+    private SyntaxTreeManager stm;
 
     public SyntaxNode(Code synCode, Object obj, SyntaxNode... nodeList) {
         this.synCode = synCode;
         this.nodes.addAll(Arrays.asList(nodeList));
         this.value = obj;
-        syntaxTreeManager = SyntaxTreeManager.getInstance();
+        this.stm = SyntaxTreeManager.getInstance();
     }
 
     private void elab_def(HashMap<String, AddressPair> rho, int nl) {
@@ -48,15 +48,14 @@ public class SyntaxNode {
             case SEQUENCE:
             {
                 for (SyntaxNode node: getNodes())
-                {
-                    node.elab_def(rho, nl);
-                }
+                    node.elab_def(rho,nl);
                 break;
             }
 
         }
 
     }
+
 
     public ArrayList<Instruction> code(HashMap<String, AddressPair> rho, int nl) {
         ArrayList<Instruction> instructions = new ArrayList<>();
@@ -148,7 +147,7 @@ public class SyntaxNode {
 
                 instructions.addAll(nodes.get(0).code(rho, nl));
 
-                Instruction ifzero = new Instruction(Instruction.IFZERO,-1);
+                Instruction ifzero = new Instruction(Instruction.IFZERO);
                 l1.addInstruction(ifzero);
                 instructions.add(ifzero);
 
@@ -243,18 +242,22 @@ public class SyntaxNode {
             }
 
             case SEQUENCE: {
-                for (SyntaxNode node : nodes)
+                for (SyntaxNode node: nodes)
+                {
                     instructions.addAll(node.code(rho,nl));
+                }
                 break;
             }
 
             case SEMICOLON: {
-
-                for (SyntaxNode node : nodes) {
-                    instructions.addAll(node.code(rho, nl));
+                for (SyntaxNode node: nodes)
+                {
+                    instructions.addAll(node.code(rho,nl));
                     instructions.add(new Instruction(Instruction.POP));
                 }
-                instructions.remove(instructions.size()-1); // Remove last pop
+
+                instructions.remove(instructions.size() -1); // Remove last pop
+
                 break;
             }
 
@@ -305,35 +308,36 @@ public class SyntaxNode {
 
                 AddressPair pair = rho.get(nodes.get(0).value);
 
-                Instruction invoke = new Instruction(Instruction.INVOKE,syntaxTreeManager.countComma(nodes.get(1))+1,-1,nl-pair.getNl());
+                Instruction invoke = new Instruction(Instruction.INVOKE, stm.countComma(nodes.get(1))+1,-1,nl-pair.getNl());
                 ((Label) pair.getLoc()).addInstruction(invoke);
                 instructions.add(invoke);
                 break;
             }
 
             case FUNCTION_DEFINITION: {
+                HashMap<String ,AddressPair> map = new HashMap<>(rho);
 
-                    HashMap<String ,AddressPair> map = new HashMap<>(rho);
+                ArrayList<String> allIds =  stm.getAllIDs(nodes.get(1));
 
-                    ArrayList<String> allIds = syntaxTreeManager.getAllIDs(nodes.get(1));
+                for (int i = 0; i < allIds.size(); i++)
+                {
+                    map.put(allIds.get(i),new AddressPair(i,nl+1));
+                }
 
-                    for (int i = 0; i < allIds.size(); i++)
-                    {
-                        map.put(allIds.get(i),new AddressPair(i,nl+1));
-                    }
+                ArrayList<Instruction> code_e = nodes.get(2).code(map,nl+1);
+                Label l = (Label) map.get(nodes.get(0).value).getLoc();
+                l.setLabeledInstruction(code_e.get(0));
+                instructions.addAll(code_e);
 
-                    ArrayList<Instruction> code_e = nodes.get(2).code(map,nl+1);
-                    Label l = (Label) map.get(nodes.get(0).value).getLoc();
-                    l.setLabeledInstruction(code_e.get(0));
-                    instructions.addAll(code_e);
+                instructions.add(new Instruction(Instruction.RETURN));
 
-                    instructions.add(new Instruction(Instruction.RETURN));
                 break;
             }
         }
 
         return instructions;
     }
+
 
     public Code getSynCode() {
         return synCode;

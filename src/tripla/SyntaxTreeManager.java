@@ -1,9 +1,6 @@
-/*
- * Nico Feld - 1169233
- */
-
 package tripla;
 
+import CodeGenerator.Instruction;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -22,43 +19,51 @@ public class SyntaxTreeManager {
     {
         if (instance == null)
             instance = new SyntaxTreeManager();
+
         return instance;
     }
 
     public void optimizeTree(SyntaxNode root)
     {
-        removeCodeStack(root, Code.SEMICOLON);
-        removeCodeStack(root, Code.SEQUENCE);
-        removeCodeStack(root, Code.COMMA);
+        removeCodeStack(root,Code.COMMA);
+        removeCodeStack(root,Code.SEQUENCE);
+        removeCodeStack(root,Code.SEMICOLON);
     }
 
-    private void removeCodeStack(SyntaxNode root,Code syncCode)
+    private void removeCodeStack(SyntaxNode root, Code synCode)
     {
-        if (root.getSynCode() == syncCode) {
+        if (root.getSynCode() == synCode)
+        {
             boolean removedNode;
             do {
-                ArrayList<SyntaxNode> tmpnodes = new ArrayList<>(root.getNodes());
                 removedNode = false;
 
-                for (SyntaxNode node : root.getNodes()) {
-                    if (node.getSynCode() == syncCode) {
-                        int index = tmpnodes.indexOf(node);
+                ArrayList<SyntaxNode> tmp = new ArrayList<>(root.getNodes());
 
-                        tmpnodes.addAll(index, node.getNodes());
+                for (SyntaxNode node: root.getNodes())
+                {
+                    if (node.getSynCode() == synCode)
+                    {
+                        int index = tmp.indexOf(node);
 
-                        tmpnodes.remove(node);
+                        tmp.addAll(index,node.getNodes());
+
+                        tmp.remove(node);
 
                         removedNode = true;
                     }
                 }
-                root.setNodes(tmpnodes);
+
+                root.setNodes(tmp);
+
             } while (removedNode);
         }
 
         for (SyntaxNode node: root.getNodes())
         {
-            removeCodeStack(node,syncCode);
+            removeCodeStack(node,synCode);
         }
+
     }
 
     public ArrayList<String> getAllIDs(SyntaxNode node)
@@ -92,7 +97,8 @@ public class SyntaxTreeManager {
         return count;
     }
 
-    public void toFile(SyntaxNode root ,String json) throws IOException {
+
+    public void toFile(String json, SyntaxNode root) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
