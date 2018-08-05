@@ -2,11 +2,15 @@
  * Nico Feld - 1169233
  */
 
-import CodeGenerator.AddressPair;
 import CodeGenerator.Instruction;
 import CodeGenerator.Label;
+import Dataflow.CFG;
+import Dataflow.CFGVertex;
+import Dataflow.LabeledCFGEdge;
 import cup.Parser;
 import flex.Lexer;
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.IntegerNameProvider;
 import tripla.SyntaxNode;
 import tripla.SyntaxTreeManager;
 
@@ -33,16 +37,23 @@ public class Main {
             stm.optimizeTree(result);
             stm.toFile(argv[1],result);
 
+            CFG cfg = new CFG();
+            cfg.build(result);
+            DOTExporter<CFGVertex, LabeledCFGEdge> exporter = new DOTExporter<>(new IntegerNameProvider<>(), CFGVertex::getLabel, LabeledCFGEdge::getLabel);
+            exporter.export(new PrintWriter(System.out),cfg);
+
             ArrayList<Instruction> code = result.code(new HashMap<>(),0);
 
             Label.replaceLabels(code);
 
+            /*
             for (Instruction instruction : code)
             {
                 System.out.println(instruction.toString());
             }
 
             System.out.println("Output: " + argv[1]);
+            */
         } catch (Exception e) {
             e.printStackTrace();
         }

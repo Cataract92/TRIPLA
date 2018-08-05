@@ -2,10 +2,10 @@ package Dataflow;
 
 public interface ICFG {
 
-    AbstractCFGVertex getIn();
-    AbstractCFGVertex getOut();
-    void setIn(AbstractCFGVertex in);
-    void setOut(AbstractCFGVertex out);
+    CFGVertex getIn();
+    CFGVertex getOut();
+    void setIn(CFGVertex in);
+    void setOut(CFGVertex out);
     void export(AbstractCFGExportStrategy exportStrategy);
 
 }
