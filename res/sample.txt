@@ -3,10 +3,12 @@ let m(x,y)
     if (x == 0) then
         y*2
     else
-        m(5,4)
+        do {
+            3+(4/3)
+        } while (x == 1)
 } n (z, w) {
     w
 } x(a,b,c)
   {
-      a
+      m(1,2)
   } in m(2,3); n(3,2); x(1,2,3)

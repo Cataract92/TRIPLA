@@ -161,7 +161,25 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge> implemen
             }
             case DO_WHILE:
             {
-                break;
+
+                CFGVertex start = new CFGVertex(node,CFGVertexType.rectangle,"");
+                this.addVertex(start);
+                this.addEdge(in,start,new LabeledCFGEdge(edgeLabel));
+
+                CFGVertex v1 = buildSubGraph(node.getNodes().get(0),start,"");
+                CFGVertex v2 = buildSubGraph(node.getNodes().get(1),v1,"");
+
+                CFGVertex end = new CFGVertex(node,CFGVertexType.rectangle,"?");
+                this.addVertex(end);
+
+                CFGVertex out = new CFGVertex(node,CFGVertexType.rectangle,"");
+                this.addVertex(out);
+
+                this.addEdge(v2,end);
+                this.addEdge(end,start,new LabeledCFGEdge("true"));
+                this.addEdge(end,out,new LabeledCFGEdge("false"));
+
+                return out;
             }
             case SEQUENCE:
             {
