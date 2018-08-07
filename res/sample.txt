@@ -4,7 +4,8 @@ let m(x,y)
         y*2
     else
         do {
-            3+(4/3)
+            3+(4/3);
+            m(x,y)
         } while (x == 1)
 } n (z, w) {
     w

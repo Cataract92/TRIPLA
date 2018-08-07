@@ -3,8 +3,9 @@ package Dataflow;
 public enum CFGVertexType {
 
     rectangle,
-    cirlce,
+    circle,
     doublecircle,
-    diamond
+    diamond,
+    none
 
 }

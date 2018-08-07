@@ -5,6 +5,7 @@
 import CodeGenerator.Instruction;
 import CodeGenerator.Label;
 import Dataflow.CFG;
+import Dataflow.CFGDotExport;
 import Dataflow.CFGVertex;
 import Dataflow.LabeledCFGEdge;
 import cup.Parser;
@@ -39,8 +40,7 @@ public class Main {
 
             CFG cfg = new CFG();
             cfg.build(result);
-            DOTExporter<CFGVertex, LabeledCFGEdge> exporter = new DOTExporter<>(new IntegerNameProvider<>(), CFGVertex::getLabel, LabeledCFGEdge::getLabel);
-            exporter.export(new PrintWriter(System.out),cfg);
+            cfg.export(new CFGDotExport());
 
             ArrayList<Instruction> code = result.code(new HashMap<>(),0);
 

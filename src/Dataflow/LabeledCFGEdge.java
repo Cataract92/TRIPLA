@@ -3,26 +3,22 @@ package Dataflow;
 public class LabeledCFGEdge {
 
     private String label;
-    private CFGVertex source;
-    private CFGVertex target;
+    private boolean constraint = true;
 
     public LabeledCFGEdge() {
         label = "";
     }
 
-    public LabeledCFGEdge(String label) {
+    public LabeledCFGEdge(String label, boolean constraint) {
         this.label = label;
+        this.constraint = constraint;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public CFGVertex getSource() {
-        return source;
-    }
-
-    public CFGVertex getTarget() {
-        return target;
+    public boolean isConstraint() {
+        return constraint;
     }
 }
