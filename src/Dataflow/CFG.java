@@ -61,6 +61,7 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
         CFGVertex main = buildSubGraph(root,in,"","");
         this.addEdge(main,out);
 
+
         for (String graph : CFGVertex.getGraphList().keySet()) {
             for (CFGVertex v : new ArrayList<>(CFGVertex.getGraphList().get(graph))) {
                 if (v.getLabel().equals("")) {
@@ -76,6 +77,7 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
                 }
             }
         }
+
     }
 
     private CFGVertex buildSubGraph(SyntaxNode node, CFGVertex in, String edgeLabel, String subGraph)
@@ -104,7 +106,7 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
             }
             case LET_IN:
             {
-                CFGVertex def = buildSubGraph(node.getNodes().get(0),in,edgeLabel,subGraph);
+                CFGVertex def = buildSubGraph(node.getNodes().get(0),in,"",subGraph);
                 CFGVertex call = buildSubGraph(node.getNodes().get(1),in,edgeLabel,subGraph);
 
                 return call;

@@ -1,15 +1,14 @@
-let m(x,y)
-{
-    if (x == 0) then
-        y*2
+let m( x , y ) {
+    if ( x == 0 ) then
+        y * 2
     else
+        let c( x , z ) {
+            x - y * z
+        } in c(2 + x , y )
+    } n( z , w) {
         do {
-            3+(4/3);
-            m(x,y)
-        } while (x == 1)
-} n (z, w) {
-    w
-} x(a,b,c)
-  {
-      m(1,2)
-  } in m(2,3); n(3,2); x(1,2,3)
+            w = w * m( z , w ) ;
+            z = z - 1
+        } while ( z > 0 ) ;
+        w
+} in m( 2 , 3 ) ; n ( 3 , 2 )
