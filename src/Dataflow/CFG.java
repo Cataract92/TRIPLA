@@ -6,6 +6,7 @@ package Dataflow;
 
 import com.sun.xml.internal.bind.v2.model.core.ID;
 import org.jgrapht.graph.DefaultDirectedGraph;
+import tripla.Code;
 import tripla.SyntaxNode;
 
 import java.io.PrintWriter;
@@ -99,14 +100,14 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
             {
                 CFGVertex v1 = buildSubGraph(node.getNodes().get(0),in,edgeLabel,subGraph);
                 CFGVertex v2 = buildSubGraph(node.getNodes().get(1),v1,"",subGraph);
-                CFGVertex out = new CFGVertex(node,CFGVertexType.rectangle, v1.getLabel()+" "+node.getSynCode().name() + " " + v2.getLabel(),subGraph);
+                CFGVertex out = new CFGVertex(node,CFGVertexType.rectangle, v1.getLabel()+" "+node.getSynCode().getName() + " " + v2.getLabel(),subGraph);
                 this.addVertex(out);
                 this.addEdge(v2,out);
                 return out;
             }
             case LET_IN:
             {
-                CFGVertex def = buildSubGraph(node.getNodes().get(0),in,"",subGraph);
+                CFGVertex def = buildSubGraph(node.getNodes().get(0),null,"",subGraph);
                 CFGVertex call = buildSubGraph(node.getNodes().get(1),in,edgeLabel,subGraph);
 
                 return call;
@@ -264,7 +265,24 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
             }
             case FUNCTION_DEFINITION:
             {
-                CFGVertex start = new CFGVertex(node,CFGVertexType.rectangle,"Start "+ (String) node.getNodes().get(0).getValue(),(String) node.getNodes().get(0).getValue());
+
+                String params = "";
+                if (node.getNodes().get(1) != null)
+                    if (node.getNodes().get(1).getSynCode() == Code.COMMA)
+                    {
+                        ArrayList<String> ids = new ArrayList<>();
+                        for (SyntaxNode n :node.getNodes().get(1).getNodes())
+                        {
+                            ids.add((String) n.getValue());
+                        }
+                        params = String.join(",",ids);
+                    } else
+                        params = (String) node.getNodes().get(1).getValue();
+                {
+
+                }
+
+                CFGVertex start = new CFGVertex(node,CFGVertexType.rectangle,"Start "+ (String) node.getNodes().get(0).getValue() + " (" +params+")",(String) node.getNodes().get(0).getValue());
 
                 this.addVertex(start);
 
@@ -273,6 +291,8 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
                 idMap.put((String)node.getNodes().get(0).getValue(),new IDSet(start,end));
 
                 this.addVertex(end);
+
+
 
                 CFGVertex body = buildSubGraph(node.getNodes().get(2),start,edgeLabel,(String) node.getNodes().get(0).getValue());
 

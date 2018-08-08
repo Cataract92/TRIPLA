@@ -26,7 +26,6 @@ public class Main {
             return;
         }
 
-
         try {
             Reader input = new FileReader(argv[0]);
             Parser p = new Parser(new Lexer(input));
