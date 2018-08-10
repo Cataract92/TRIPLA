@@ -37,8 +37,7 @@ public class Main {
             stm.optimizeTree(result);
             stm.toFile(argv[1],result);
 
-            CFG cfg = new CFG();
-            cfg.build(result);
+            CFG cfg = new CFG("",result,"in","out",new HashMap<>());
             cfg.export(new CFGDotExport());
 
             ArrayList<Instruction> code = result.code(new HashMap<>(),0);

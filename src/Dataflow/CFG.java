@@ -4,7 +4,6 @@
 
 package Dataflow;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import tripla.Code;
 import tripla.SyntaxNode;
@@ -12,12 +11,10 @@ import tripla.SyntaxNode;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
-public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
+public class CFG extends DefaultDirectedGraph<CFGVertex, LabeledCFGEdge> {
 
-    private class IDSet
-    {
+    private class IDSet {
         private CFGVertex in;
         private CFGVertex out;
 
@@ -43,48 +40,41 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
         }
     }
 
-    private HashMap<String,IDSet> idMap = new HashMap<>();
+    private HashMap<String, CFG> subCFGs;
     private CFGVertex in, out;
+    private String name;
 
-    public CFG() {
+    public CFG(String name, SyntaxNode root, String LabelIn, String LabelOut, HashMap<String, CFG> subCFGs) {
         super(LabeledCFGEdge.class);
-    }
 
-    public void build(SyntaxNode root){
+        this.name = name;
+        this.subCFGs = new HashMap<>(subCFGs);
 
-        in = new CFGVertex(null,CFGVertexType.doublecircle,"in","");
-
+        in = new CFGVertex(null, CFGVertexType.doublecircle, LabelIn);
         this.addVertex(in);
 
-        out = new CFGVertex(null,CFGVertexType.doublecircle,"out","");
+        out = new CFGVertex(null, CFGVertexType.doublecircle, LabelOut);
         this.addVertex(out);
 
-        CFGVertex main = buildSubGraph(root,in,"","");
-        this.addEdge(main,out);
+        CFGVertex main = buildSubGraph(root, in, "");
+        this.addEdge(main, out);
 
 
-        for (String graph : CFGVertex.getGraphList().keySet()) {
-            for (CFGVertex v : new ArrayList<>(CFGVertex.getGraphList().get(graph))) {
-                if (v.getLabel().equals("")) {
-
-                    for (LabeledCFGEdge e1 : this.incomingEdgesOf(v)) {
-                        for (LabeledCFGEdge e2 : this.outgoingEdgesOf(v)) {
-                            this.addEdge(this.getEdgeSource(e1), this.getEdgeTarget(e2), new LabeledCFGEdge(e1.getLabel(), e1.isConstraint()));
-                        }
+        for (CFGVertex v : new ArrayList<>(this.vertexSet())) {
+            if (v.getLabel().equals("")) {
+                for (LabeledCFGEdge e1 : this.incomingEdgesOf(v)) {
+                    for (LabeledCFGEdge e2 : this.outgoingEdgesOf(v)) {
+                        this.addEdge(this.getEdgeSource(e1), this.getEdgeTarget(e2), new LabeledCFGEdge(e1.getLabel(), e1.isConstraint()));
                     }
-
-                    this.removeVertex(v);
-                    CFGVertex.getGraphList().get(graph).remove(v);
                 }
+                this.removeVertex(v);
             }
         }
-
     }
 
-    private CFGVertex buildSubGraph(SyntaxNode node, CFGVertex in, String edgeLabel, String subGraph)
-    {
-        switch (node.getSynCode())
-        {
+
+    private CFGVertex buildSubGraph(SyntaxNode node, CFGVertex in, String edgeLabel) {
+        switch (node.getSynCode()) {
             case OP_AND:
             case OP_OR:
             case OP_ADD:
@@ -96,119 +86,107 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
             case OP_GT:
             case OP_LT:
             case OP_GTE:
-            case OP_LTE:
-            {
-                CFGVertex v1 = buildSubGraph(node.getNodes().get(0),in,edgeLabel,subGraph);
-                CFGVertex v2 = buildSubGraph(node.getNodes().get(1),v1,"",subGraph);
-                CFGVertex out = new CFGVertex(node,CFGVertexType.rectangle, v1.getLabel()+" "+node.getSynCode().getName() + " " + v2.getLabel(),subGraph);
+            case OP_LTE: {
+                CFGVertex v1 = buildSubGraph(node.getNodes().get(0), in, edgeLabel);
+                CFGVertex v2 = buildSubGraph(node.getNodes().get(1), v1, "");
+                CFGVertex out = new CFGVertex(node, CFGVertexType.rectangle, v1.getLabel() + " " + node.getSynCode().getName() + " " + v2.getLabel());
                 this.addVertex(out);
-                this.addEdge(v2,out);
+                this.addEdge(v2, out);
                 return out;
             }
-            case LET_IN:
-            {
-                CFGVertex def = buildSubGraph(node.getNodes().get(0),null,"",subGraph);
-                CFGVertex call = buildSubGraph(node.getNodes().get(1),in,edgeLabel,subGraph);
+            case LET_IN: {
+                CFGVertex def = buildSubGraph(node.getNodes().get(0), null, "");
+                CFGVertex call = buildSubGraph(node.getNodes().get(1), in, edgeLabel);
 
                 return call;
             }
-            case IF_THEN_ELSE:
-            {
-                CFGVertex pre = buildSubGraph(node.getNodes().get(0),in,edgeLabel,subGraph);
+            case IF_THEN_ELSE: {
+                CFGVertex pre = buildSubGraph(node.getNodes().get(0), in, edgeLabel);
 
-                CFGVertex e = new CFGVertex(node,CFGVertexType.diamond,"?",subGraph);
+                CFGVertex e = new CFGVertex(node, CFGVertexType.diamond, "?");
 
                 this.addVertex(e);
 
-                addEdge(pre,e);
+                addEdge(pre, e);
 
-                CFGVertex t = buildSubGraph(node.getNodes().get(1),e,"true",subGraph);
-                CFGVertex f = buildSubGraph(node.getNodes().get(2),e,"false",subGraph);
+                CFGVertex t = buildSubGraph(node.getNodes().get(1), e, "true");
+                CFGVertex f = buildSubGraph(node.getNodes().get(2), e, "false");
 
-                CFGVertex out = new CFGVertex(node,CFGVertexType.circle,"",subGraph);
+                CFGVertex out = new CFGVertex(node, CFGVertexType.circle, "");
 
                 this.addVertex(out);
 
-                addEdge(t,out);
-                addEdge(f,out);
+                addEdge(t, out);
+                addEdge(f, out);
 
                 return out;
             }
-            case ASSIGN:
-            {
+            case ASSIGN: {
 
-                CFGVertex v1 = buildSubGraph(node.getNodes().get(1),in,edgeLabel,subGraph);
+                CFGVertex v1 = buildSubGraph(node.getNodes().get(1), in, edgeLabel);
 
-                CFGVertex v2 = new CFGVertex(node,CFGVertexType.rectangle, (String) node.getNodes().get(0).getValue() + " = " +  v1.getLabel(),subGraph);
+                CFGVertex v2 = new CFGVertex(node, CFGVertexType.rectangle, (String) node.getNodes().get(0).getValue() + " = " + v1.getLabel());
 
                 this.addVertex(v2);
 
-                addEdge(v1,v2);
+                addEdge(v1, v2);
 
                 return v2;
             }
-            case CONST:
-            {
-                CFGVertex out = new CFGVertex(node,CFGVertexType.rectangle,((Integer) node.getValue()).toString(),subGraph);
+            case CONST: {
+                CFGVertex out = new CFGVertex(node, CFGVertexType.rectangle, ((Integer) node.getValue()).toString());
                 this.addVertex(out);
-                this.addEdge(in,out,new LabeledCFGEdge(edgeLabel,true));
+                this.addEdge(in, out, new LabeledCFGEdge(edgeLabel, true));
                 return out;
             }
-            case ID:
-            {
-                CFGVertex out = new CFGVertex(node,CFGVertexType.rectangle,(String) node.getValue(),subGraph);
+            case ID: {
+                CFGVertex out = new CFGVertex(node, CFGVertexType.rectangle, (String) node.getValue());
                 this.addVertex(out);
-                this.addEdge(in,out,new LabeledCFGEdge(edgeLabel,true));
+                this.addEdge(in, out, new LabeledCFGEdge(edgeLabel, true));
                 return out;
             }
-            case COMMA:
-            {
+            case COMMA: {
                 CFGVertex tmp = in;
-                for (SyntaxNode n : node.getNodes())
-                {
-                    CFGVertex v = buildSubGraph(n,tmp,edgeLabel,subGraph);
+                for (SyntaxNode n : node.getNodes()) {
+                    CFGVertex v = buildSubGraph(n, tmp, edgeLabel);
                     edgeLabel = "";
-                    this.addEdge(tmp,v);
+                    this.addEdge(tmp, v);
                     tmp = v;
                 }
 
                 return tmp;
             }
-            case BOOL:
-            {
-                CFGVertex out = new CFGVertex(node,CFGVertexType.rectangle,((Boolean) node.getValue())? "true" : "false",subGraph);
+            case BOOL: {
+                CFGVertex out = new CFGVertex(node, CFGVertexType.rectangle, ((Boolean) node.getValue()) ? "true" : "false");
                 this.addVertex(out);
-                this.addEdge(in,out,new LabeledCFGEdge(edgeLabel,true));
+                this.addEdge(in, out, new LabeledCFGEdge(edgeLabel, true));
                 return out;
             }
-            case DO_WHILE:
-            {
+            case DO_WHILE: {
 
-                CFGVertex start = new CFGVertex(node,CFGVertexType.rectangle,"",subGraph);
+                CFGVertex start = new CFGVertex(node, CFGVertexType.rectangle, "");
                 this.addVertex(start);
-                this.addEdge(in,start,new LabeledCFGEdge(edgeLabel,true));
+                this.addEdge(in, start, new LabeledCFGEdge(edgeLabel, true));
 
-                CFGVertex v1 = buildSubGraph(node.getNodes().get(0),start,"",subGraph);
-                CFGVertex v2 = buildSubGraph(node.getNodes().get(1),v1,"",subGraph);
+                CFGVertex v1 = buildSubGraph(node.getNodes().get(0), start, "");
+                CFGVertex v2 = buildSubGraph(node.getNodes().get(1), v1, "");
 
-                CFGVertex end = new CFGVertex(node,CFGVertexType.diamond,"?",subGraph);
+                CFGVertex end = new CFGVertex(node, CFGVertexType.diamond, "?");
                 this.addVertex(end);
 
-                CFGVertex out = new CFGVertex(node,CFGVertexType.circle,"",subGraph);
+                CFGVertex out = new CFGVertex(node, CFGVertexType.circle, "");
                 this.addVertex(out);
 
-                this.addEdge(v2,end);
-                this.addEdge(end,start,new LabeledCFGEdge("true",true));
-                this.addEdge(end,out,new LabeledCFGEdge("false",true));
+                this.addEdge(v2, end);
+                this.addEdge(end, start, new LabeledCFGEdge("true", true));
+                this.addEdge(end, out, new LabeledCFGEdge("false", true));
 
                 return out;
             }
-            case SEQUENCE:
-            {
+            case SEQUENCE: {
                 CFGVertex tmp = in;
-                for (SyntaxNode n : node.getNodes())
-                {
-                    CFGVertex v = buildSubGraph(n,tmp,edgeLabel,subGraph);
+                for (SyntaxNode n : node.getNodes()) {
+                    CFGVertex v = buildSubGraph(n, tmp, edgeLabel);
                     //this.addEdge(tmp,v);
                     tmp = v;
                 }
@@ -216,95 +194,92 @@ public class CFG extends DefaultDirectedGraph<CFGVertex,LabeledCFGEdge>{
                 return tmp;
 
             }
-            case SEMICOLON:
-            {
+            case SEMICOLON: {
 
                 CFGVertex tmp = in;
-                for (SyntaxNode n : node.getNodes())
-                {
-                    CFGVertex v = buildSubGraph(n,tmp,edgeLabel,subGraph);
+                for (SyntaxNode n : node.getNodes()) {
+                    CFGVertex v = buildSubGraph(n, tmp, edgeLabel);
                     tmp = v;
                 }
 
                 return tmp;
             }
-            case PARENTHESES:
-            {
+            case PARENTHESES: {
                 CFGVertex tmp = in;
-                for (SyntaxNode n : node.getNodes())
-                {
-                    CFGVertex v = buildSubGraph(n,tmp,edgeLabel,subGraph);
-                    this.addEdge(tmp,v,new LabeledCFGEdge(edgeLabel,true));
+                for (SyntaxNode n : node.getNodes()) {
+                    CFGVertex v = buildSubGraph(n, tmp, edgeLabel);
+                    this.addEdge(tmp, v, new LabeledCFGEdge(edgeLabel, true));
                     tmp = v;
                 }
 
                 return tmp;
             }
-            case FUNCTION_CALL:
-            {
-                CFGVertex params = buildSubGraph(node.getNodes().get(1),in,edgeLabel,subGraph);
+            case FUNCTION_CALL: {
+                CFGVertex params = buildSubGraph(node.getNodes().get(1), in, edgeLabel);
 
-                CFGVertex call = new CFGVertex(node,CFGVertexType.rectangle,"Call " +(String) node.getNodes().get(0).getValue(),subGraph);
+                CFGVertex call = new CFGVertex(node, CFGVertexType.rectangle, "Call " + (String) node.getNodes().get(0).getValue());
 
                 this.addVertex(call);
 
-                CFGVertex ret = new CFGVertex(node,CFGVertexType.rectangle,"return " +(String) node.getNodes().get(0).getValue(),subGraph);
+                CFGVertex ret = new CFGVertex(node, CFGVertexType.rectangle, "return " + (String) node.getNodes().get(0).getValue());
 
                 this.addVertex(ret);
 
-                this.addEdge(params,call);
-                this.addEdge(call,ret);
+                this.addEdge(params, call);
+                this.addEdge(call, ret);
 
-                IDSet set = idMap.get((String) node.getNodes().get(0).getValue());
+                CFG sub = subCFGs.get((String) node.getNodes().get(0).getValue());
 
-                this.addEdge(call,set.getIn(),new LabeledCFGEdge("",false));
+                this.addVertex(sub.getIn());
+                this.addVertex(sub.getOut());
 
-                this.addEdge(set.getOut(),ret,new LabeledCFGEdge("",false));
+                this.addEdge(call, sub.getIn(), new LabeledCFGEdge("", false));
+
+                this.addEdge(sub.getOut(), ret, new LabeledCFGEdge("", false));
 
                 return ret;
             }
-            case FUNCTION_DEFINITION:
-            {
+            case FUNCTION_DEFINITION: {
 
                 String params = "";
                 if (node.getNodes().get(1) != null)
-                    if (node.getNodes().get(1).getSynCode() == Code.COMMA)
-                    {
+                    if (node.getNodes().get(1).getSynCode() == Code.COMMA) {
                         ArrayList<String> ids = new ArrayList<>();
-                        for (SyntaxNode n :node.getNodes().get(1).getNodes())
-                        {
+                        for (SyntaxNode n : node.getNodes().get(1).getNodes()) {
                             ids.add((String) n.getValue());
                         }
-                        params = String.join(",",ids);
+                        params = String.join(",", ids);
                     } else
                         params = (String) node.getNodes().get(1).getValue();
                 {
 
                 }
 
-                CFGVertex start = new CFGVertex(node,CFGVertexType.rectangle,"Start "+ (String) node.getNodes().get(0).getValue() + " (" +params+")",(String) node.getNodes().get(0).getValue());
+                subCFGs.put((String) node.getNodes().get(0).getValue(), new CFG((String) node.getNodes().get(0).getValue(), node.getNodes().get(2), "Start " + (String) node.getNodes().get(0).getValue() + " (" + params + ")", "End " + (String) node.getNodes().get(0).getValue(),this.getSubCFGs()));
 
-                this.addVertex(start);
-
-                CFGVertex end = new CFGVertex(node,CFGVertexType.rectangle,"End "+ (String) node.getNodes().get(0).getValue(),(String) node.getNodes().get(0).getValue());
-
-                idMap.put((String)node.getNodes().get(0).getValue(),new IDSet(start,end));
-
-                this.addVertex(end);
-
-
-
-                CFGVertex body = buildSubGraph(node.getNodes().get(2),start,edgeLabel,(String) node.getNodes().get(0).getValue());
-
-                this.addEdge(body,end);
-
-                return end;
+                return null;
             }
         }
         return null;
     }
 
     public void export(AbstractCFGExportStrategy exportStrategy) {
-        exportStrategy.export(new PrintWriter(System.out),this);
+        exportStrategy.export(new PrintWriter(System.out), this);
+    }
+
+    public CFGVertex getIn() {
+        return in;
+    }
+
+    public CFGVertex getOut() {
+        return out;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public HashMap<String, CFG> getSubCFGs() {
+        return subCFGs;
     }
 }
