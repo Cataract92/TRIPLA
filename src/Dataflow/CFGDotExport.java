@@ -45,7 +45,7 @@ public class CFGDotExport extends AbstractCFGExportStrategy {
         }
 
         for (LabeledCFGEdge e : cfg.edgeSet()) {
-            printWriter.print("  " + this.cfg.getEdgeSource(e) + " -> " + cfg.getEdgeTarget(e));
+            printWriter.print("  " + (this.vertexIDProvider.getVertexName(cfg.getEdgeSource(e)) + " -> " + this.vertexIDProvider.getVertexName(cfg.getEdgeTarget(e))));
             printWriter.println(" [label = \"" + e.getLabel() + "\", constraint = \"" + e.isConstraint() + "\", color=\""+e.getColor()+"\"]");
         }
         printWriter.println("\n  }");
