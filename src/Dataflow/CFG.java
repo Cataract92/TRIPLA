@@ -4,10 +4,14 @@
 
 package Dataflow;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
+import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import tripla.Code;
 import tripla.SyntaxNode;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,7 +154,6 @@ public class CFG extends DefaultDirectedGraph<CFGVertex, LabeledCFGEdge> {
                 for (SyntaxNode n : node.getNodes()) {
                     CFGVertex v = buildSubGraph(n, tmp, edgeLabel);
                     edgeLabel = "";
-                    this.addEdge(tmp, v);
                     tmp = v;
                 }
 
@@ -199,6 +202,7 @@ public class CFG extends DefaultDirectedGraph<CFGVertex, LabeledCFGEdge> {
                 CFGVertex tmp = in;
                 for (SyntaxNode n : node.getNodes()) {
                     CFGVertex v = buildSubGraph(n, tmp, edgeLabel);
+                    edgeLabel = "";
                     tmp = v;
                 }
 
@@ -207,7 +211,7 @@ public class CFG extends DefaultDirectedGraph<CFGVertex, LabeledCFGEdge> {
             case PARENTHESES: {
                 CFGVertex tmp = in;
                 for (SyntaxNode n : node.getNodes()) {
-                    CFGVertex v = buildSubGraph(n, tmp, edgeLabel);
+                    CFGVertex v = buildSubGraph(n, tmp, "");
                     this.addEdge(tmp, v, new LabeledCFGEdge(edgeLabel, true));
                     tmp = v;
                 }
@@ -242,20 +246,24 @@ public class CFG extends DefaultDirectedGraph<CFGVertex, LabeledCFGEdge> {
             case FUNCTION_DEFINITION: {
 
                 String params = "";
-                if (node.getNodes().get(1) != null)
+                if (node.getNodes().get(1) != null) {
                     if (node.getNodes().get(1).getSynCode() == Code.COMMA) {
                         ArrayList<String> ids = new ArrayList<>();
                         for (SyntaxNode n : node.getNodes().get(1).getNodes()) {
                             ids.add((String) n.getValue());
                         }
                         params = String.join(",", ids);
-                    } else
+                    } else {
                         params = (String) node.getNodes().get(1).getValue();
-                {
-
+                    }
                 }
 
-                subCFGs.put((String) node.getNodes().get(0).getValue(), new CFG((String) node.getNodes().get(0).getValue(), node.getNodes().get(2), "Start " + (String) node.getNodes().get(0).getValue() + " (" + params + ")", "End " + (String) node.getNodes().get(0).getValue(),this.getSubCFGs()));
+                CFG subCFG = new CFG((String) node.getNodes().get(0).getValue(), node.getNodes().get(2), "Start " + (String) node.getNodes().get(0).getValue() + " (" + params + ")", "End " + (String) node.getNodes().get(0).getValue(), this.getSubCFGs());
+
+                subCFG.getIn().setSyntaxNode(node);
+                subCFG.getOut().setSyntaxNode(node);
+
+                subCFGs.put((String) node.getNodes().get(0).getValue(), subCFG);
 
                 return null;
             }
@@ -263,8 +271,8 @@ public class CFG extends DefaultDirectedGraph<CFGVertex, LabeledCFGEdge> {
         return null;
     }
 
-    public void export(AbstractCFGExportStrategy exportStrategy) {
-        exportStrategy.export(new PrintWriter(System.out), this);
+    public void export(AbstractCFGExportStrategy exportStrategy) throws IOException {
+        exportStrategy.export(new FileWriter("res/graph.dot"), this);
     }
 
     public CFGVertex getIn() {
@@ -281,5 +289,12 @@ public class CFG extends DefaultDirectedGraph<CFGVertex, LabeledCFGEdge> {
 
     public HashMap<String, CFG> getSubCFGs() {
         return subCFGs;
+    }
+
+    public void mergeWithSubGraphs() {
+        for (CFG c : subCFGs.values()) {
+            c.mergeWithSubGraphs();
+            Graphs.addGraph(this, c);
+        }
     }
 }

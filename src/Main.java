@@ -4,12 +4,10 @@
 
 import CodeGenerator.Instruction;
 import CodeGenerator.Label;
-import Dataflow.CFG;
-import Dataflow.CFGDotExport;
-import Dataflow.CFGVertex;
-import Dataflow.LabeledCFGEdge;
+import Dataflow.*;
 import cup.Parser;
 import flex.Lexer;
+import org.jgrapht.Graphs;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.IntegerNameProvider;
 import tripla.SyntaxNode;
@@ -39,8 +37,14 @@ public class Main {
 
             CFG cfg = new CFG("",result,"in","out",new HashMap<>());
             cfg.export(new CFGDotExport());
+            cfg.mergeWithSubGraphs();
+
+            new DOTExporter<>(new IntegerNameProvider<>(), CFGVertex::getLabel, LabeledCFGEdge::getLabel).export(new PrintWriter(System.out),cfg);
+
+            new ReachedUsesStrategy().compute(cfg);
 
             ArrayList<Instruction> code = result.code(new HashMap<>(),0);
+
 
             Label.replaceLabels(code);
 

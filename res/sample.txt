@@ -1,10 +1,12 @@
-let m( x ) {
+let m( x , y ) {
     if ( x == 0 ) then
         3
     else
-        let c(y) {
+        5;
+        6;
+        let n(y) {
             x - 3 * 3
-        } in c(2 + x , 3 )
+        } in n(2 + x , 3 )
     } n( z , w) {
         do {
             w = w * m( z , w ) ;

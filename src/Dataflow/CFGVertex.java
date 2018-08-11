@@ -39,4 +39,7 @@ public class CFGVertex {
         this.style = style;
     }
 
+    public void setSyntaxNode(SyntaxNode syntaxNode) {
+        this.syntaxNode = syntaxNode;
+    }
 }

@@ -11,10 +11,19 @@ public enum CFGColors {
     brown,
     cyan,
     gold,
-    aqua,
     fuchsia,
     navy,
-    olive,
-    teal,
+    aquamarine,
+    bisque,
+    chocolate,
+    chartreuse2,
+    coral,
+    crimson,
+    darkgoldenrot,
+    deepskyblue,
+    firebrick,
+    indigo,
+    magenta,
+    lightblue
 
 }
