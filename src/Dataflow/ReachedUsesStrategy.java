@@ -3,11 +3,8 @@ package Dataflow;
 import tripla.Code;
 import tripla.SyntaxNode;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 public class ReachedUsesStrategy {
 

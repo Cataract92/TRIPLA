@@ -73,6 +73,15 @@ terminal Boolean BOOL;
 non terminal SyntaxNode E, D, A, V, C;
 
 /* Precedences  */
+/*
+precedence left SEMICOLON, COMMA, ID;
+precedence nonassoc ASSIGN, IF, THEN, ELSE;
+precedence nonassoc OP_LT, OP_GT, OP_EQ, OP_NEQ, OP_LTE, OP_GTE;
+precedence left OP_ADD, OP_SUB, OP_OR;
+precedence left OP_MULT, OP_DIV, OP_AND;
+*/
+
+precedence left IF, THEN, ELSE;
 precedence left COMMA, SEMICOLON, ID;
 precedence left ASSIGN;
 precedence left OP_OR;
@@ -80,7 +89,6 @@ precedence left OP_AND;
 precedence left OP_EQ, OP_NEQ, OP_LT, OP_GT, OP_GTE, OP_LTE;
 precedence left OP_ADD, OP_SUB;
 precedence left OP_MULT, OP_DIV;
-
 
 /* The grammar */
 start with E;
