@@ -5,65 +5,65 @@ digraph G {
      style="dashed"    color="navy";
   subgraph cluster_f {
     label="f";
-     style="dashed"    color="crimson";
+     style="dashed"    color="chartreuse2";
   subgraph cluster_g {
     label="g";
-     style="dashed"    color="gold";
-1 [label = "Start g (x)", shape = "doublecircle", style = "", color="gold"];
-2 [label = "End g", shape = "doublecircle", style = "", color="gold"];
-3 [label = "7", shape = "rectangle", style = "", color="gold"];
-4 [label = "x = 7", shape = "rectangle", style = "", color="gold"];
-5 [label = "y", shape = "rectangle", style = "", color="gold"];
-6 [label = "0", shape = "rectangle", style = "", color="gold"];
-7 [label = "y > 0", shape = "rectangle", style = "", color="gold"];
-8 [label = "?", shape = "diamond", style = "", color="gold"];
-9 [label = "y", shape = "rectangle", style = "", color="gold"];
-10 [label = "Call g", shape = "rectangle", style = "", color="gold"];
-11 [label = "return g", shape = "rectangle", style = "", color="gold"];
-12 [label = "8", shape = "rectangle", style = "", color="gold"];
-13 [label = "x = 8", shape = "rectangle", style = "", color="gold"];
-14 [label = "x", shape = "rectangle", style = "", color="gold"];
-  1 -> 3 [xlabel = "", constraint = "true", color="gold"]
-  3 -> 4 [xlabel = "", constraint = "true", color="gold"]
-  4 -> 5 [xlabel = "", constraint = "true", color="gold"]
-  5 -> 6 [xlabel = "", constraint = "true", color="gold"]
-  6 -> 7 [xlabel = "", constraint = "true", color="gold"]
-  7 -> 8 [xlabel = "", constraint = "true", color="gold"]
-  8 -> 9 [xlabel = "true", constraint = "true", color="gold"]
-  9 -> 10 [xlabel = "", constraint = "true", color="gold"]
-  10 -> 11 [xlabel = "", constraint = "true", color="gold"]
-  10 -> 1 [xlabel = "", constraint = "false", color="gold"]
-  2 -> 11 [xlabel = "", constraint = "false", color="gold"]
-  8 -> 12 [xlabel = "false", constraint = "true", color="gold"]
-  12 -> 13 [xlabel = "", constraint = "true", color="gold"]
-  14 -> 2 [xlabel = "", constraint = "true", color="gold"]
-  11 -> 14 [xlabel = "", constraint = "true", color="gold"]
-  13 -> 14 [xlabel = "", constraint = "true", color="gold"]
+     style="dashed"    color="chartreuse2";
+1 [label = "Start g (x)", shape = "doublecircle", style = "", color="chartreuse2"];
+2 [label = "End g", shape = "doublecircle", style = "", color="chartreuse2"];
+3 [label = "7", shape = "rectangle", style = "", color="chartreuse2"];
+4 [label = "x = 7", shape = "rectangle", style = "", color="chartreuse2"];
+5 [label = "y", shape = "rectangle", style = "", color="chartreuse2"];
+6 [label = "0", shape = "rectangle", style = "", color="chartreuse2"];
+7 [label = "y > 0", shape = "rectangle", style = "", color="chartreuse2"];
+8 [label = "?", shape = "diamond", style = "", color="chartreuse2"];
+9 [label = "y", shape = "rectangle", style = "", color="chartreuse2"];
+10 [label = "Call g", shape = "rectangle", style = "", color="chartreuse2"];
+11 [label = "return g", shape = "rectangle", style = "", color="chartreuse2"];
+12 [label = "8", shape = "rectangle", style = "", color="chartreuse2"];
+13 [label = "x = 8", shape = "rectangle", style = "", color="chartreuse2"];
+14 [label = "x", shape = "rectangle", style = "", color="chartreuse2"];
+  1 -> 3 [xlabel = "", constraint = "true", color="chartreuse2"]
+  3 -> 4 [xlabel = "", constraint = "true", color="chartreuse2"]
+  4 -> 5 [xlabel = "", constraint = "true", color="chartreuse2"]
+  5 -> 6 [xlabel = "", constraint = "true", color="chartreuse2"]
+  6 -> 7 [xlabel = "", constraint = "true", color="chartreuse2"]
+  7 -> 8 [xlabel = "", constraint = "true", color="chartreuse2"]
+  8 -> 9 [xlabel = "true", constraint = "true", color="chartreuse2"]
+  9 -> 10 [xlabel = "", constraint = "true", color="chartreuse2"]
+  10 -> 11 [xlabel = "", constraint = "true", color="chartreuse2"]
+  10 -> 1 [xlabel = "", constraint = "false", color="chartreuse2"]
+  2 -> 11 [xlabel = "", constraint = "false", color="chartreuse2"]
+  8 -> 12 [xlabel = "false", constraint = "true", color="chartreuse2"]
+  12 -> 13 [xlabel = "", constraint = "true", color="chartreuse2"]
+  14 -> 2 [xlabel = "", constraint = "true", color="chartreuse2"]
+  11 -> 14 [xlabel = "", constraint = "true", color="chartreuse2"]
+  13 -> 14 [xlabel = "", constraint = "true", color="chartreuse2"]
 
 }
-15 [label = "Start f (x,y,z)", shape = "doublecircle", style = "", color="crimson"];
-16 [label = "End f", shape = "doublecircle", style = "", color="crimson"];
-17 [label = "2", shape = "rectangle", style = "", color="crimson"];
-18 [label = "y = 2", shape = "rectangle", style = "", color="crimson"];
-19 [label = "3", shape = "rectangle", style = "", color="crimson"];
-20 [label = "z = 3", shape = "rectangle", style = "", color="crimson"];
-21 [label = "x", shape = "rectangle", style = "", color="crimson"];
-22 [label = "Call g", shape = "rectangle", style = "", color="crimson"];
-23 [label = "return g", shape = "rectangle", style = "", color="crimson"];
-24 [label = "x", shape = "rectangle", style = "", color="crimson"];
-25 [label = "return g + x", shape = "rectangle", style = "", color="crimson"];
-  15 -> 17 [xlabel = "", constraint = "true", color="crimson"]
-  17 -> 18 [xlabel = "", constraint = "true", color="crimson"]
-  18 -> 19 [xlabel = "", constraint = "true", color="crimson"]
-  19 -> 20 [xlabel = "", constraint = "true", color="crimson"]
-  20 -> 21 [xlabel = "", constraint = "true", color="crimson"]
-  21 -> 22 [xlabel = "", constraint = "true", color="crimson"]
-  22 -> 23 [xlabel = "", constraint = "true", color="crimson"]
-  22 -> 1 [xlabel = "", constraint = "false", color="crimson"]
-  2 -> 23 [xlabel = "", constraint = "false", color="crimson"]
-  23 -> 24 [xlabel = "", constraint = "true", color="crimson"]
-  24 -> 25 [xlabel = "", constraint = "true", color="crimson"]
-  25 -> 16 [xlabel = "", constraint = "true", color="crimson"]
+15 [label = "Start f (x,y,z)", shape = "doublecircle", style = "", color="chartreuse2"];
+16 [label = "End f", shape = "doublecircle", style = "", color="chartreuse2"];
+17 [label = "2", shape = "rectangle", style = "", color="chartreuse2"];
+18 [label = "y = 2", shape = "rectangle", style = "", color="chartreuse2"];
+19 [label = "3", shape = "rectangle", style = "", color="chartreuse2"];
+20 [label = "z = 3", shape = "rectangle", style = "", color="chartreuse2"];
+21 [label = "x", shape = "rectangle", style = "", color="chartreuse2"];
+22 [label = "Call g", shape = "rectangle", style = "", color="chartreuse2"];
+23 [label = "return g", shape = "rectangle", style = "", color="chartreuse2"];
+24 [label = "x", shape = "rectangle", style = "", color="chartreuse2"];
+25 [label = "return g + x", shape = "rectangle", style = "", color="chartreuse2"];
+  15 -> 17 [xlabel = "", constraint = "true", color="chartreuse2"]
+  17 -> 18 [xlabel = "", constraint = "true", color="chartreuse2"]
+  18 -> 19 [xlabel = "", constraint = "true", color="chartreuse2"]
+  19 -> 20 [xlabel = "", constraint = "true", color="chartreuse2"]
+  20 -> 21 [xlabel = "", constraint = "true", color="chartreuse2"]
+  21 -> 22 [xlabel = "", constraint = "true", color="chartreuse2"]
+  22 -> 23 [xlabel = "", constraint = "true", color="chartreuse2"]
+  22 -> 1 [xlabel = "", constraint = "false", color="chartreuse2"]
+  2 -> 23 [xlabel = "", constraint = "false", color="chartreuse2"]
+  23 -> 24 [xlabel = "", constraint = "true", color="chartreuse2"]
+  24 -> 25 [xlabel = "", constraint = "true", color="chartreuse2"]
+  25 -> 16 [xlabel = "", constraint = "true", color="chartreuse2"]
 
 }
 26 [label = "in", shape = "doublecircle", style = "", color="navy"];

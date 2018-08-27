@@ -3,6 +3,7 @@ package Dataflow;
 import tripla.Code;
 import tripla.SyntaxNode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -48,14 +49,13 @@ public class ReachedUsesStrategy {
 
         for (CFGVertex v : cfg.vertexSet()) {
 
-
-
-            IN.put(v, new HashSet<>());
-            OUT.put(v, new HashSet<>());
-            GEN.put(v, new HashSet<>());
-            KILL.put(v, new HashSet<>());
-
             if (v.getSyntaxNode() == null) continue;
+
+            IN.put(v,new HashSet<>());
+            OUT.put(v,new HashSet<>());
+            GEN.put(v,new HashSet<>());
+            KILL.put(v,new HashSet<>());
+
 
             switch (v.getSyntaxNode().getSynCode()) {
                 case ID: {
@@ -83,22 +83,13 @@ public class ReachedUsesStrategy {
 
         for (int i = 0; i < 1; i++) {
             for (CFGVertex v : cfg.vertexSet()) {
+
                 if (v.getSyntaxNode() == null) continue;
 
                 HashSet<Pair> allIN = new HashSet<>();
 
-                for (LabeledCFGEdge e : cfg.outgoingEdgesOf(v)) {
-                    if (cfg.getEdgeTarget(e).getSyntaxNode() == null)
-                    {
-                        for (LabeledCFGEdge e2 :cfg.outgoingEdgesOf(cfg.getEdgeTarget(e)))
-                        {
-                            allIN.addAll(IN.get(cfg.getEdgeTarget(e2)));
-                        }
-                    } else
-                    {
-                        allIN.addAll(IN.get(cfg.getEdgeTarget(e)));
-                    }
-
+                for (CFGVertex succ : getValidPredecessor(v,cfg)) {
+                        allIN.addAll(IN.get(succ));
                 }
 
                 OUT.put(v, allIN);
@@ -113,7 +104,86 @@ public class ReachedUsesStrategy {
             }
         }
 
+        //IN.keySet().stream().forEach(cfgVertex -> System.out.println(cfgVertex.getLabel()));
+
         System.out.println("Done");
+
+
     }
 
+    private ArrayList<CFGVertex> getValidSuccessors(CFGVertex root,CFG cfg)
+    {
+        ArrayList<CFGVertex> list = new ArrayList<>();
+        for (LabeledCFGEdge e : cfg.outgoingEdgesOf(root))
+        {
+            CFGVertex target = cfg.getEdgeTarget(e);
+            if (target.getSyntaxNode() == null){
+                list.addAll(getValidSuccessors(target,cfg));
+            } else
+            {
+                switch (target.getSyntaxNode().getSynCode())
+                {
+                    case FUNCTION_DEFINITION:
+                    case ASSIGN:
+                    case ID:
+                    {
+                        list.add(target);
+                        break;
+                    }
+                    default:
+                    {
+                        list.addAll(getValidSuccessors(target,cfg));
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
+    private ArrayList<CFGVertex> getValidPredecessor(CFGVertex root,CFG cfg)
+    {
+        ArrayList<CFGVertex> list = new ArrayList<>();
+        for (LabeledCFGEdge e : cfg.incomingEdgesOf(root))
+        {
+            CFGVertex target = cfg.getEdgeSource(e);
+            if (target.getSyntaxNode() == null){
+                list.addAll(getValidPredecessor(target,cfg));
+            } else
+            {
+                list.add(target);
+            }
+        }
+        return list;
+    }
+
+    /*
+    private ArrayList<CFGVertex> getValidPredecessor(CFGVertex root,CFG cfg)
+    {
+        ArrayList<CFGVertex> list = new ArrayList<>();
+        for (LabeledCFGEdge e : cfg.incomingEdgesOf(root))
+        {
+            CFGVertex target = cfg.getEdgeSource(e);
+            if (target.getSyntaxNode() == null){
+                list.addAll(getValidPredecessor(target,cfg));
+            } else
+            {
+                switch (target.getSyntaxNode().getSynCode())
+                {
+                    case FUNCTION_DEFINITION:
+                    case ASSIGN:
+                    case ID:
+                    {
+                        list.add(target);
+                        break;
+                    }
+                    default:
+                    {
+                        list.addAll(getValidPredecessor(target,cfg));
+                    }
+                }
+            }
+        }
+        return list;
+    }
+*/
 }

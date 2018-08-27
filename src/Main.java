@@ -39,7 +39,7 @@ public class Main {
             cfg.export(new CFGDotExport());
             cfg.mergeWithSubGraphs();
 
-            new DOTExporter<>(new IntegerNameProvider<>(), CFGVertex::getLabel, LabeledCFGEdge::getLabel).export(new PrintWriter(System.out),cfg);
+            //new DOTExporter<>(new IntegerNameProvider<>(), CFGVertex::getLabel, LabeledCFGEdge::getLabel).export(new PrintWriter(System.out),cfg);
 
             new ReachedUsesStrategy().compute(cfg);
 
