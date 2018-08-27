@@ -232,15 +232,21 @@ public class CFG extends DefaultDirectedGraph<CFGVertex, LabeledCFGEdge> {
                 this.addEdge(params, call);
                 this.addEdge(call, ret);
 
-                CFG sub = subCFGs.get((String) node.getNodes().get(0).getValue());
+                // No recursive call
+                if (!this.getName().equals((String) node.getNodes().get(0).getValue())) {
+                    CFG sub = subCFGs.get((String) node.getNodes().get(0).getValue());
 
-                this.addVertex(sub.getIn());
-                this.addVertex(sub.getOut());
+                    this.addVertex(sub.getIn());
+                    this.addVertex(sub.getOut());
 
-                this.addEdge(call, sub.getIn(), new LabeledCFGEdge("", false));
-
-                this.addEdge(sub.getOut(), ret, new LabeledCFGEdge("", false));
-
+                    this.addEdge(call, sub.getIn(), new LabeledCFGEdge("", false));
+                    this.addEdge(sub.getOut(), ret, new LabeledCFGEdge("", false));
+                } else
+                // recursive call
+                {
+                    this.addEdge(call, this.getIn(), new LabeledCFGEdge("", false));
+                    this.addEdge(this.getOut(), ret, new LabeledCFGEdge("", false));
+                }
                 return ret;
             }
             case FUNCTION_DEFINITION: {
