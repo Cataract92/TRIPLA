@@ -66,7 +66,7 @@ public class ReachedUsesStrategy {
                 }
 
                 case ASSIGN: {
-                    KILL.get(v).add(new Pair(v, (String) v.getSyntaxNode().getValue()));
+                    KILL.get(v).add(new Pair(null, (String) v.getSyntaxNode().getNodes().get(0).getValue()));
                     break;
                 }
                 case FUNCTION_DEFINITION: {
@@ -81,15 +81,15 @@ public class ReachedUsesStrategy {
             }
         }
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 100; i++) {
             for (CFGVertex v : cfg.vertexSet()) {
 
                 if (v.getSyntaxNode() == null) continue;
 
                 HashSet<Pair> allIN = new HashSet<>();
 
-                for (CFGVertex succ : getValidPredecessor(v,cfg)) {
-                        allIN.addAll(IN.get(succ));
+                for (CFGVertex pre : getValidSuccessors(v,cfg)) {
+                        allIN.addAll(IN.get(pre));
                 }
 
                 OUT.put(v, allIN);
@@ -104,10 +104,39 @@ public class ReachedUsesStrategy {
             }
         }
 
+        for (CFGVertex v : cfg.vertexSet())
+        {
+            if (v.getSyntaxNode() == null)
+                continue;
+
+            if ( !((v.getSyntaxNode().getSynCode() == Code.FUNCTION_DEFINITION && v.getLabel().startsWith("Start")) || v.getSyntaxNode().getSynCode() == Code.ASSIGN))
+                continue;
+
+
+            for (Pair pair : OUT.get(v))
+            {
+                HashSet<Pair> hashSet = KILL.get(v);
+                if (hashSet.stream().anyMatch(pair1 -> pair.id.equals(pair1.id)))
+                {
+                    cfg.addEdge(v,pair.vertex,new LabeledCFGEdge("___",true));
+                }
+
+            }
+
+            /*
+            OUT.get(v).stream().filter(pair -> {
+                return KILL.get(v).stream().anyMatch(pair1 -> pair1.id.equals(pair.id));
+            }).forEach(pair -> {
+                System.out.println(v);
+                System.out.println(pair);
+                cfg.addEdge(v,pair.vertex,new LabeledCFGEdge("___",true));
+            });
+*/
+        }
+
         //IN.keySet().stream().forEach(cfgVertex -> System.out.println(cfgVertex.getLabel()));
 
         System.out.println("Done");
-
 
     }
 
@@ -121,20 +150,7 @@ public class ReachedUsesStrategy {
                 list.addAll(getValidSuccessors(target,cfg));
             } else
             {
-                switch (target.getSyntaxNode().getSynCode())
-                {
-                    case FUNCTION_DEFINITION:
-                    case ASSIGN:
-                    case ID:
-                    {
-                        list.add(target);
-                        break;
-                    }
-                    default:
-                    {
-                        list.addAll(getValidSuccessors(target,cfg));
-                    }
-                }
+                list.add(target);
             }
         }
         return list;
