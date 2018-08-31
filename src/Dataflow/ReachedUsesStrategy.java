@@ -66,7 +66,7 @@ public class ReachedUsesStrategy {
                 }
 
                 case ASSIGN: {
-                    KILL.get(v).add(new Pair(null, (String) v.getSyntaxNode().getNodes().get(0).getValue()));
+                    KILL.get(v).add(new Pair(v, (String) v.getSyntaxNode().getNodes().get(0).getValue()));
                     break;
                 }
                 case FUNCTION_DEFINITION: {
@@ -81,15 +81,15 @@ public class ReachedUsesStrategy {
             }
         }
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             for (CFGVertex v : cfg.vertexSet()) {
 
                 if (v.getSyntaxNode() == null) continue;
 
                 HashSet<Pair> allIN = new HashSet<>();
 
-                for (CFGVertex pre : getValidSuccessors(v,cfg)) {
-                        allIN.addAll(IN.get(pre));
+                for (CFGVertex suc : getValidSuccessors(v,cfg)) {
+                        allIN.addAll(IN.get(suc));
                 }
 
                 OUT.put(v, allIN);
@@ -116,6 +116,8 @@ public class ReachedUsesStrategy {
             for (Pair pair : OUT.get(v))
             {
                 HashSet<Pair> hashSet = KILL.get(v);
+
+
                 if (hashSet.stream().anyMatch(pair1 -> pair.id.equals(pair1.id)))
                 {
                     cfg.addEdge(v,pair.vertex,new LabeledCFGEdge("___",true));

@@ -81,8 +81,8 @@ precedence left OP_ADD, OP_SUB, OP_OR;
 precedence left OP_MULT, OP_DIV, OP_AND;
 */
 
-precedence left IF, THEN, ELSE;
 precedence left COMMA, SEMICOLON, ID;
+precedence left IF, THEN, ELSE;
 precedence left ASSIGN;
 precedence left OP_OR;
 precedence left OP_AND;
