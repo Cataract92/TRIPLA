@@ -36,12 +36,13 @@ public class Main {
             stm.toFile(argv[1],result);
 
             CFG cfg = new CFG("",result,"in","out",new HashMap<>());
-            cfg.export(new CFGDotExport());
+
             cfg.mergeWithSubGraphs();
 
             new ReachedUsesStrategy().compute(cfg);
 
-            new DOTExporter<>(new IntegerNameProvider<>(), CFGVertex::getLabel, LabeledCFGEdge::getLabel).export(new PrintWriter(System.out),cfg);
+            cfg.export(new CFGDotExport());
+            //new DOTExporter<>(new IntegerNameProvider<>(), CFGVertex::getLabel, LabeledCFGEdge::getLabel).export(new PrintWriter(System.out),cfg);
 
             ArrayList<Instruction> code = result.code(new HashMap<>(),0);
 

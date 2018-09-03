@@ -3,9 +3,7 @@ package Dataflow;
 import tripla.Code;
 import tripla.SyntaxNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class ReachedUsesStrategy {
 
@@ -38,7 +36,7 @@ public class ReachedUsesStrategy {
     private HashMap<CFGVertex, HashSet<Pair>> IN = new HashMap<>();
     private HashMap<CFGVertex, HashSet<Pair>> OUT = new HashMap<>();
     private HashMap<CFGVertex, HashSet<Pair>> GEN = new HashMap<>();
-    private HashMap<CFGVertex, HashSet<Pair>> KILL = new HashMap<>();
+    private HashMap<CFGVertex, List<String>> KILL = new HashMap<>();
 
 
     public void compute(CFG cfg) {
@@ -54,7 +52,7 @@ public class ReachedUsesStrategy {
             IN.put(v,new HashSet<>());
             OUT.put(v,new HashSet<>());
             GEN.put(v,new HashSet<>());
-            KILL.put(v,new HashSet<>());
+            KILL.put(v,new LinkedList<>());
 
 
             switch (v.getSyntaxNode().getSynCode()) {
@@ -66,16 +64,16 @@ public class ReachedUsesStrategy {
                 }
 
                 case ASSIGN: {
-                    KILL.get(v).add(new Pair(v, (String) v.getSyntaxNode().getNodes().get(0).getValue()));
+                    KILL.get(v).add((String) v.getSyntaxNode().getNodes().get(0).getValue());
                     break;
                 }
                 case FUNCTION_DEFINITION: {
                     if (v.getSyntaxNode().getNodes().get(1).getSynCode() == Code.COMMA) {
                         for (SyntaxNode n : v.getSyntaxNode().getNodes().get(1).getNodes()) {
-                            KILL.get(v).add(new Pair(v, (String) n.getValue()));
+                            KILL.get(v).add((String) n.getValue());
                         }
                     } else {
-                        KILL.get(v).add(new Pair(v, (String) v.getSyntaxNode().getNodes().get(0).getValue()));
+                        KILL.get(v).add((String) v.getSyntaxNode().getNodes().get(1).getValue());
                     }
                 }
             }
@@ -96,7 +94,7 @@ public class ReachedUsesStrategy {
 
                 HashSet<Pair> tmp = new HashSet<>(allIN);
 
-                tmp.removeAll(KILL.get(v));
+                allIN.stream().filter(pair -> KILL.get(v).contains(pair.id)).forEach(tmp::remove);
 
                 tmp.addAll(GEN.get(v));
 
@@ -115,14 +113,13 @@ public class ReachedUsesStrategy {
 
             for (Pair pair : OUT.get(v))
             {
-                HashSet<Pair> hashSet = KILL.get(v);
-
-
-                if (hashSet.stream().anyMatch(pair1 -> pair.id.equals(pair1.id)))
+                if (KILL.get(v).contains(pair.id))
                 {
-                    cfg.addEdge(v,pair.vertex,new LabeledCFGEdge("___",true));
+                    LabeledCFGEdge e = new LabeledCFGEdge();
+                    e.setStyle("dashed");
+                    e.setColor("black");
+                    cfg.addEdge(v,pair.vertex,e);
                 }
-
             }
 
             /*

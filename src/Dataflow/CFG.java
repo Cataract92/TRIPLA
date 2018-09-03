@@ -7,6 +7,7 @@ package Dataflow;
 import com.sun.corba.se.impl.orbutil.graph.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DirectedMultigraph;
 import tripla.Code;
 import tripla.SyntaxNode;
 
@@ -16,7 +17,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CFG extends DefaultDirectedGraph<CFGVertex, LabeledCFGEdge> {
+public class CFG extends DirectedMultigraph<CFGVertex, LabeledCFGEdge> {
 
     private class IDSet {
         private CFGVertex in;

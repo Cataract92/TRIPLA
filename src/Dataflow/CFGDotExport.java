@@ -37,12 +37,13 @@ public class CFGDotExport extends AbstractCFGExportStrategy {
 
         writer.write("    color=\"" + color + "\";\n");
 
+/*
         for (CFG c : cfg.getSubCFGs().values()) {
             if (!drawnGraphs.contains(c)) {
                 drawnGraphs.add(c);
                 printGraph(writer, c);
             }
-        }
+        }*/
 
         for (CFGVertex v : cfg.vertexSet()) {
             if (!drawnVertexes.contains(v)) {
@@ -55,8 +56,9 @@ public class CFGDotExport extends AbstractCFGExportStrategy {
         for (LabeledCFGEdge e : cfg.edgeSet()) {
             if (!drawnEdges.contains(e)) {
                 drawnEdges.add(e);
+                String edgeColor =  e.getColor().equals("") ? color : e.getColor();
                 writer.write("  " + (this.vertexIDProvider.getVertexName(cfg.getEdgeSource(e)) + " -> " + this.vertexIDProvider.getVertexName(cfg.getEdgeTarget(e))));
-                writer.write(" [xlabel = \"" + e.getLabel() + "\", constraint = \"" + e.isConstraint() + "\", color=\"" + color + "\"]\n");
+                writer.write(" [xlabel = \"" + e.getLabel() + "\", constraint = \"" + e.isConstraint() + "\", color=\"" + edgeColor + "\" , style=\"" + e.getStyle() + "\" ]\n");
             }
         }
 

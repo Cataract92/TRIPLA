@@ -4,7 +4,8 @@ public class LabeledCFGEdge {
 
     private String label;
     private boolean constraint = true;
-    private String color = "black";
+    private String color = "";
+    private String style = "";
 
     public LabeledCFGEdge() {
         label = "";
@@ -29,5 +30,13 @@ public class LabeledCFGEdge {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
     }
 }
