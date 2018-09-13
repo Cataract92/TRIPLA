@@ -36,19 +36,17 @@ public class SyntaxNode {
 
     private void elab_def(HashMap<String, AddressPair> rho, int nl) {
 
-        switch (synCode){
+        switch (synCode) {
 
-            case FUNCTION_DEFINITION:
-            {
+            case FUNCTION_DEFINITION: {
                 Label l = new Label();
-                rho.put((String) nodes.get(0).value,new AddressPair(l,nl));
+                rho.put((String) nodes.get(0).value, new AddressPair(l, nl));
                 break;
             }
 
-            case SEQUENCE:
-            {
-                for (SyntaxNode node: getNodes())
-                    node.elab_def(rho,nl);
+            case SEQUENCE: {
+                for (SyntaxNode node : getNodes())
+                    node.elab_def(rho, nl);
                 break;
             }
 
@@ -65,7 +63,7 @@ public class SyntaxNode {
             case ID: {
                 AddressPair pair = rho.get(value);
 
-                instructions.add(new Instruction(Instruction.LOAD,(Integer) pair.getLoc(),nl - pair.getNl()));
+                instructions.add(new Instruction(Instruction.LOAD, (Integer) pair.getLoc(), nl - pair.getNl()));
                 break;
             }
 
@@ -78,9 +76,8 @@ public class SyntaxNode {
             }
 
             case COMMA: {
-                for (SyntaxNode node: nodes)
-                {
-                    instructions.addAll(node.code(rho,nl));
+                for (SyntaxNode node : nodes) {
+                    instructions.addAll(node.code(rho, nl));
                 }
                 break;
             }
@@ -91,22 +88,22 @@ public class SyntaxNode {
             }
 
             case OP_EQ: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.EQ));
                 break;
             }
 
             case OP_GT: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.GT));
                 break;
             }
 
             case OP_LT: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.LT));
                 break;
             }
@@ -115,22 +112,22 @@ public class SyntaxNode {
                 Label l1 = new Label();
                 Label l2 = new Label();
 
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
 
                 instructions.add(new Instruction(Instruction.ADD));
 
-                Instruction ifzero = new Instruction(Instruction.IFZERO,-1);
+                Instruction ifzero = new Instruction(Instruction.IFZERO, -1);
                 l1.addInstruction(ifzero);
                 instructions.add(ifzero);
 
-                instructions.add(new Instruction(Instruction.CONST,1));
+                instructions.add(new Instruction(Instruction.CONST, 1));
 
-                Instruction gTo = new Instruction(Instruction.GOTO,-1);
+                Instruction gTo = new Instruction(Instruction.GOTO, -1);
                 l2.addInstruction(gTo);
                 instructions.add(gTo);
 
-                Instruction const0 = new Instruction(Instruction.CONST,0);
+                Instruction const0 = new Instruction(Instruction.CONST, 0);
                 l1.setLabeledInstruction(const0);
                 instructions.add(const0);
 
@@ -153,7 +150,7 @@ public class SyntaxNode {
 
                 instructions.addAll(nodes.get(1).code(rho, nl));
 
-                Instruction gTo = new Instruction(Instruction.GOTO,-1);
+                Instruction gTo = new Instruction(Instruction.GOTO, -1);
                 l2.addInstruction(gTo);
                 instructions.add(gTo);
 
@@ -185,7 +182,7 @@ public class SyntaxNode {
 
                 instructions.add(new Instruction(Instruction.POP));
 
-                Instruction gTo = new Instruction(Instruction.GOTO,-1);
+                Instruction gTo = new Instruction(Instruction.GOTO, -1);
                 l1.addInstruction(gTo);
                 instructions.add(gTo);
 
@@ -200,22 +197,22 @@ public class SyntaxNode {
                 AddressPair pair = rho.get(nodes.get(0).value);
 
                 instructions.addAll(nodes.get(1).code(rho, nl));
-                instructions.add(new Instruction(Instruction.STORE,(Integer) pair.getLoc(),nl - pair.getNl()));
-                instructions.add(new Instruction(Instruction.LOAD,(Integer) pair.getLoc(),nl - pair.getNl()));
+                instructions.add(new Instruction(Instruction.STORE, (Integer) pair.getLoc(), nl - pair.getNl()));
+                instructions.add(new Instruction(Instruction.LOAD, (Integer) pair.getLoc(), nl - pair.getNl()));
                 break;
             }
 
             case LET_IN: {
                 Label label = new Label();
 
-                Instruction gTo = new Instruction(Instruction.GOTO,-1);
+                Instruction gTo = new Instruction(Instruction.GOTO, -1);
                 label.addInstruction(gTo);
                 instructions.add(gTo);
 
-                nodes.get(0).elab_def(rho,nl);
-                instructions.addAll(nodes.get(0).code(rho,nl));
+                nodes.get(0).elab_def(rho, nl);
+                instructions.addAll(nodes.get(0).code(rho, nl));
 
-                ArrayList<Instruction> code_e = nodes.get(1).code(rho,nl);
+                ArrayList<Instruction> code_e = nodes.get(1).code(rho, nl);
                 label.setLabeledInstruction(code_e.get(0));
                 instructions.addAll(code_e);
 
@@ -223,82 +220,80 @@ public class SyntaxNode {
             }
 
             case OP_ADD: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.ADD));
                 break;
             }
 
             case OP_AND: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.MULT));
                 break;
             }
 
             case PARENTHESES: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
                 break;
             }
 
             case SEQUENCE: {
-                for (SyntaxNode node: nodes)
-                {
-                    instructions.addAll(node.code(rho,nl));
+                for (SyntaxNode node : nodes) {
+                    instructions.addAll(node.code(rho, nl));
                 }
                 break;
             }
 
             case SEMICOLON: {
-                for (SyntaxNode node: nodes)
-                {
-                    instructions.addAll(node.code(rho,nl));
+                for (SyntaxNode node : nodes) {
+                    instructions.addAll(node.code(rho, nl));
                     instructions.add(new Instruction(Instruction.POP));
                 }
 
-                instructions.remove(instructions.size() -1); // Remove last pop
+                instructions.remove(instructions.size() - 1); // Remove last pop
 
                 break;
             }
 
             case OP_SUB: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.SUB));
                 break;
             }
 
             case OP_MULT: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.MULT));
                 break;
             }
 
             case OP_DIV: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.DIV));
                 break;
             }
 
             case OP_NEQ: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.NEQ));
                 break;
             }
 
             case OP_GTE: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.GTE));
                 break;
             }
 
             case OP_LTE: {
-                instructions.addAll(nodes.get(0).code(rho,nl));
-                instructions.addAll(nodes.get(1).code(rho,nl));
+                instructions.addAll(nodes.get(0).code(rho, nl));
+                instructions.addAll(nodes.get(1).code(rho, nl));
                 instructions.add(new Instruction(Instruction.LTE));
                 break;
             }
@@ -308,23 +303,22 @@ public class SyntaxNode {
 
                 AddressPair pair = rho.get(nodes.get(0).value);
 
-                Instruction invoke = new Instruction(Instruction.INVOKE, stm.countComma(nodes.get(1))+1,-1,nl-pair.getNl());
+                Instruction invoke = new Instruction(Instruction.INVOKE, stm.countComma(nodes.get(1)) + 1, -1, nl - pair.getNl());
                 ((Label) pair.getLoc()).addInstruction(invoke);
                 instructions.add(invoke);
                 break;
             }
 
             case FUNCTION_DEFINITION: {
-                HashMap<String ,AddressPair> map = new HashMap<>(rho);
+                HashMap<String, AddressPair> map = new HashMap<>(rho);
 
-                ArrayList<String> allIds =  stm.getAllIDs(nodes.get(1));
+                ArrayList<String> allIds = stm.getAllIDs(nodes.get(1));
 
-                for (int i = 0; i < allIds.size(); i++)
-                {
-                    map.put(allIds.get(i),new AddressPair(i,nl+1));
+                for (int i = 0; i < allIds.size(); i++) {
+                    map.put(allIds.get(i), new AddressPair(i, nl + 1));
                 }
 
-                ArrayList<Instruction> code_e = nodes.get(2).code(map,nl+1);
+                ArrayList<Instruction> code_e = nodes.get(2).code(map, nl + 1);
                 Label l = (Label) map.get(nodes.get(0).value).getLoc();
                 l.setLabeledInstruction(code_e.get(0));
                 instructions.addAll(code_e);

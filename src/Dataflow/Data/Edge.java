@@ -55,20 +55,20 @@ public class Edge {
         ArrayList<String> attributes = new ArrayList<>();
 
         if (!getLabel().equals(""))
-            attributes.add("label = \""+getLabel()+"\"");
+            attributes.add("label = \"" + getLabel() + "\"");
 
         if (!isConstraint())
             attributes.add("constraint = \"false\"");
 
         if (!getColor().equals("black"))
-            attributes.add("color = \""+getColor()+"\"");
+            attributes.add("color = \"" + getColor() + "\"");
 
         if (!getStyle().equals(""))
-            attributes.add("style = \""+getStyle()+"\"");
+            attributes.add("style = \"" + getStyle() + "\"");
 
         if (attributes.isEmpty())
             return "";
 
-        return "["+String.join(",",attributes)+"]";
+        return "[" + String.join(",", attributes) + "]";
     }
 }

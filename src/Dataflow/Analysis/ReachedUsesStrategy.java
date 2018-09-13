@@ -56,10 +56,10 @@ public class ReachedUsesStrategy {
 
             if (v.getSyntaxNode() == null) continue;
 
-            IN.put(v,new HashSet<>());
-            OUT.put(v,new HashSet<>());
-            GEN.put(v,new HashSet<>());
-            KILL.put(v,new LinkedList<>());
+            IN.put(v, new HashSet<>());
+            OUT.put(v, new HashSet<>());
+            GEN.put(v, new HashSet<>());
+            KILL.put(v, new LinkedList<>());
 
 
             switch (v.getSyntaxNode().getSynCode()) {
@@ -93,8 +93,8 @@ public class ReachedUsesStrategy {
 
                 HashSet<Pair> allIN = new HashSet<>();
 
-                for (Vertex suc : getValidSuccessors(v,cfg)) {
-                        allIN.addAll(IN.get(suc));
+                for (Vertex suc : getValidSuccessors(v, cfg)) {
+                    allIN.addAll(IN.get(suc));
                 }
 
                 OUT.put(v, allIN);
@@ -109,24 +109,21 @@ public class ReachedUsesStrategy {
             }
         }
 
-        for (Vertex v : cfg.vertexSet())
-        {
+        for (Vertex v : cfg.vertexSet()) {
             if (v.getSyntaxNode() == null)
                 continue;
 
-            if ( !((v.getSyntaxNode().getSynCode() == Code.FUNCTION_DEFINITION && v.getLabel().startsWith("Start")) || v.getSyntaxNode().getSynCode() == Code.ASSIGN))
+            if (!((v.getSyntaxNode().getSynCode() == Code.FUNCTION_DEFINITION && v.getLabel().startsWith("Start")) || v.getSyntaxNode().getSynCode() == Code.ASSIGN))
                 continue;
 
 
-            for (Pair pair : OUT.get(v))
-            {
-                if (KILL.get(v).contains(pair.id))
-                {
+            for (Pair pair : OUT.get(v)) {
+                if (KILL.get(v).contains(pair.id)) {
                     Edge e = new Edge();
                     e.setStyle("dashed");
                     e.setConstraint(false);
                     e.setColor("green");
-                    cfg.addEdge(v,pair.vertex,e);
+                    cfg.addEdge(v, pair.vertex, e);
                 }
             }
 
@@ -134,16 +131,13 @@ public class ReachedUsesStrategy {
 
     }
 
-    private ArrayList<Vertex> getValidSuccessors(Vertex root, CFG cfg)
-    {
+    private ArrayList<Vertex> getValidSuccessors(Vertex root, CFG cfg) {
         ArrayList<Vertex> list = new ArrayList<>();
-        for (Edge e : cfg.outgoingEdgesOf(root))
-        {
+        for (Edge e : cfg.outgoingEdgesOf(root)) {
             Vertex target = cfg.getEdgeTarget(e);
-            if (target.getSyntaxNode() == null){
-                list.addAll(getValidSuccessors(target,cfg));
-            } else
-            {
+            if (target.getSyntaxNode() == null) {
+                list.addAll(getValidSuccessors(target, cfg));
+            } else {
                 list.add(target);
             }
         }

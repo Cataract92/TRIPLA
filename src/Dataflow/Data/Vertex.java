@@ -59,16 +59,16 @@ public class Vertex {
         ArrayList<String> attributes = new ArrayList<>();
 
         if (!getLabel().equals(""))
-            attributes.add("label = \""+getLabel()+"\"");
+            attributes.add("label = \"" + getLabel() + "\"");
 
-        attributes.add("shape = \""+getType()+"\"");
+        attributes.add("shape = \"" + getType() + "\"");
 
         if (!getColor().equals("black"))
-            attributes.add("color = \""+getColor()+"\"");
+            attributes.add("color = \"" + getColor() + "\"");
 
         if (!getStyle().equals(""))
-            attributes.add("style = \""+getStyle()+"\"");
+            attributes.add("style = \"" + getStyle() + "\"");
 
-        return "["+String.join(",",attributes)+"]";
+        return "[" + String.join(",", attributes) + "]";
     }
 }

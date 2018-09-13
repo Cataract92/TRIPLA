@@ -2,7 +2,7 @@
 
 <!-- Nico Feld - 1169233 -->
 
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="TRIPLA" basedir="." default="build">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="TRIPLA" basedir="." default="run">
     <property name="src.dir" value="src"/>
     <property name="build.dir" value="${basedir}/META-INF/classes"/>
     <property name="name" value="TRIPLA"/>

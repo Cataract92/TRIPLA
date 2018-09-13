@@ -14,38 +14,32 @@ public class SyntaxTreeManager {
 
     private static SyntaxTreeManager instance;
 
-    public static SyntaxTreeManager getInstance()
-    {
+    public static SyntaxTreeManager getInstance() {
         if (instance == null)
             instance = new SyntaxTreeManager();
 
         return instance;
     }
 
-    public void optimizeTree(SyntaxNode root)
-    {
-        removeCodeStack(root,Code.COMMA);
-        removeCodeStack(root,Code.SEQUENCE);
-        removeCodeStack(root,Code.SEMICOLON);
+    public void optimizeTree(SyntaxNode root) {
+        removeCodeStack(root, Code.COMMA);
+        removeCodeStack(root, Code.SEQUENCE);
+        removeCodeStack(root, Code.SEMICOLON);
     }
 
-    private void removeCodeStack(SyntaxNode root, Code synCode)
-    {
-        if (root.getSynCode() == synCode)
-        {
+    private void removeCodeStack(SyntaxNode root, Code synCode) {
+        if (root.getSynCode() == synCode) {
             boolean removedNode;
             do {
                 removedNode = false;
 
                 ArrayList<SyntaxNode> tmp = new ArrayList<>(root.getNodes());
 
-                for (SyntaxNode node: root.getNodes())
-                {
-                    if (node.getSynCode() == synCode)
-                    {
+                for (SyntaxNode node : root.getNodes()) {
+                    if (node.getSynCode() == synCode) {
                         int index = tmp.indexOf(node);
 
-                        tmp.addAll(index,node.getNodes());
+                        tmp.addAll(index, node.getNodes());
 
                         tmp.remove(node);
 
@@ -58,38 +52,30 @@ public class SyntaxTreeManager {
             } while (removedNode);
         }
 
-        for (SyntaxNode node: root.getNodes())
-        {
-            removeCodeStack(node,synCode);
+        for (SyntaxNode node : root.getNodes()) {
+            removeCodeStack(node, synCode);
         }
 
     }
 
-    public ArrayList<String> getAllIDs(SyntaxNode node)
-    {
+    public ArrayList<String> getAllIDs(SyntaxNode node) {
         ArrayList<String> list = new ArrayList<>();
 
-        if (node.getSynCode() == Code.ID)
-        {
-            list.add((String)node.getValue());
-        } else if (node.getSynCode() == Code.COMMA)
-        {
-            for (SyntaxNode n : node.getNodes())
-            {
+        if (node.getSynCode() == Code.ID) {
+            list.add((String) node.getValue());
+        } else if (node.getSynCode() == Code.COMMA) {
+            for (SyntaxNode n : node.getNodes()) {
                 list.addAll(getAllIDs(n));
             }
         }
         return list;
     }
 
-    public int countComma(SyntaxNode node)
-    {
+    public int countComma(SyntaxNode node) {
         int count = 0;
-        if (node.getSynCode() == Code.COMMA)
-        {
+        if (node.getSynCode() == Code.COMMA) {
             count++;
-            for (SyntaxNode n : node.getNodes())
-            {
+            for (SyntaxNode n : node.getNodes()) {
                 count += countComma(n);
             }
         }

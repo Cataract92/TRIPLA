@@ -23,40 +23,31 @@ public class Label {
         this.labeledInstruction = labeledInstruction;
     }
 
-    public void addInstruction(Instruction instruction)
-    {
+    public void addInstruction(Instruction instruction) {
         instructions.add(instruction);
     }
 
-    public ArrayList<Instruction> getInstructions()
-    {
+    public ArrayList<Instruction> getInstructions() {
         return instructions;
     }
 
-    public static void replaceLabels(ArrayList<Instruction> instructions)
-    {
-        for (Label label : allLabels)
-        {
+    public static void replaceLabels(ArrayList<Instruction> instructions) {
+        for (Label label : allLabels) {
             int address = instructions.indexOf(label.labeledInstruction);
 
-            for (Instruction inst: label.getInstructions())
-            {
-                switch (inst.getOpcode())
-                {
-                    case Instruction.GOTO :
-                    {
+            for (Instruction inst : label.getInstructions()) {
+                switch (inst.getOpcode()) {
+                    case Instruction.GOTO: {
                         inst.setArg1(address);
                         break;
                     }
 
-                    case Instruction.INVOKE :
-                    {
+                    case Instruction.INVOKE: {
                         inst.setArg2(address);
                         break;
                     }
 
-                    case Instruction.IFZERO :
-                    {
+                    case Instruction.IFZERO: {
                         inst.setArg1(address);
                         break;
                     }

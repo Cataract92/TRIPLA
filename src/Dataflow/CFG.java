@@ -38,12 +38,12 @@ public class CFG extends DirectedMultigraph<Vertex, Edge> {
 
     }
 
-    private HashMap<String, HashMap<String,IDSet>> functions = new HashMap<>();
+    private HashMap<String, HashMap<String, IDSet>> functions = new HashMap<>();
 
     public CFG(SyntaxNode root, String LabelIn, String LabelOut) {
         super(Edge.class);
 
-        this.functions.put("",new HashMap<>());
+        this.functions.put("", new HashMap<>());
 
         Vertex in = new Vertex(null, VertexType.doublecircle, LabelIn);
         this.addVertex(in);
@@ -68,10 +68,10 @@ public class CFG extends DirectedMultigraph<Vertex, Edge> {
     }
 
     private Vertex buildSubGraph(SyntaxNode node, Vertex in, String edgeLabel) {
-        return buildSubGraph(node,in,edgeLabel,"");
+        return buildSubGraph(node, in, edgeLabel, "");
     }
 
-    private Vertex buildSubGraph(SyntaxNode node, Vertex in, String edgeLabel,String currentFunction) {
+    private Vertex buildSubGraph(SyntaxNode node, Vertex in, String edgeLabel, String currentFunction) {
         switch (node.getSynCode()) {
             case OP_AND:
             case OP_OR:
@@ -227,11 +227,10 @@ public class CFG extends DirectedMultigraph<Vertex, Edge> {
                 this.addEdge(params, call);
                 this.addEdge(call, ret);
 
-                IDSet set =this.functions.get(currentFunction).get((String) node.getNodes().get(0).getValue());
+                IDSet set = this.functions.get(currentFunction).get((String) node.getNodes().get(0).getValue());
 
-                this.addEdge(call,set.getIn());
-                this.addEdge(set.getOut(),ret);
-
+                this.addEdge(call, set.getIn());
+                this.addEdge(set.getOut(), ret);
 
 
                 return ret;
@@ -251,22 +250,22 @@ public class CFG extends DirectedMultigraph<Vertex, Edge> {
                     }
                 }
 
-                Vertex start = new Vertex(node,VertexType.hexagon,"Start " + (String) node.getNodes().get(0).getValue() + " (" + params + ")");
+                Vertex start = new Vertex(node, VertexType.hexagon, "Start " + (String) node.getNodes().get(0).getValue() + " (" + params + ")");
                 start.setColor("red");
                 start.setStyle("bold");
-                Vertex end = new Vertex(node,VertexType.hexagon,"End " + (String) node.getNodes().get(0).getValue());
+                Vertex end = new Vertex(node, VertexType.hexagon, "End " + (String) node.getNodes().get(0).getValue());
                 end.setColor("red");
                 end.setStyle("bold");
                 this.addVertex(start);
                 this.addVertex(end);
 
-                this.functions.get(currentFunction).put((String) node.getNodes().get(0).getValue(),new IDSet(start,end));
+                this.functions.get(currentFunction).put((String) node.getNodes().get(0).getValue(), new IDSet(start, end));
 
-                this.functions.put((String) node.getNodes().get(0).getValue(),new HashMap<>(this.functions.get(currentFunction)));
+                this.functions.put((String) node.getNodes().get(0).getValue(), new HashMap<>(this.functions.get(currentFunction)));
 
-                Vertex main = buildSubGraph(node.getNodes().get(2),start,"",(String) node.getNodes().get(0).getValue());
+                Vertex main = buildSubGraph(node.getNodes().get(2), start, "", (String) node.getNodes().get(0).getValue());
 
-                this.addEdge(main,end);
+                this.addEdge(main, end);
 
                 return end;
             }

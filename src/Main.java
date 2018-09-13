@@ -25,13 +25,13 @@ public class Main {
 
         File source = new File(argv[0]);
 
-        String output = argv[1]+"/"+source.getName().substring(0,source.getName().lastIndexOf("."));
+        String output = argv[1] + "/" + source.getName().substring(0, source.getName().lastIndexOf("."));
 
-        SyntaxNode result = buildAndPrintTree(source,output);
+        SyntaxNode result = buildAndPrintTree(source, output);
 
-        doDataflowAnalysis(result,output);
+        doDataflowAnalysis(result, output);
 
-        printInstructions(result,output);
+        printInstructions(result, output);
     }
 
     private static SyntaxNode buildAndPrintTree(File sample, String output) {
@@ -46,7 +46,7 @@ public class Main {
             SyntaxTreeManager stm = SyntaxTreeManager.getInstance();
 
             stm.optimizeTree(result);
-            stm.toFile(output+".json",result);
+            stm.toFile(output + ".json", result);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -54,25 +54,23 @@ public class Main {
         return result;
     }
 
-    private static void doDataflowAnalysis(SyntaxNode root, String output)
-    {
-        CFG cfg = new CFG(root,"in","out");
+    private static void doDataflowAnalysis(SyntaxNode root, String output) {
+        CFG cfg = new CFG(root, "in", "out");
 
         new ReachedUsesStrategy().compute(cfg);
 
-        cfg.export(new DotExportStrategy(),output+".dot");
+        cfg.export(new DotExportStrategy(), output + ".dot");
     }
 
-    private static void printInstructions(SyntaxNode root, String output)
-    {
-        ArrayList<Instruction> code = root.code(new HashMap<>(),0);
+    private static void printInstructions(SyntaxNode root, String output) {
+        ArrayList<Instruction> code = root.code(new HashMap<>(), 0);
 
         Label.replaceLabels(code);
 
         try {
-            FileWriter fileWriter = new FileWriter(output+".tram");
+            FileWriter fileWriter = new FileWriter(output + ".tram");
             for (Instruction instruction : code)
-                fileWriter.write(instruction.toString()+"\n");
+                fileWriter.write(instruction.toString() + "\n");
 
             fileWriter.close();
         } catch (IOException e) {
