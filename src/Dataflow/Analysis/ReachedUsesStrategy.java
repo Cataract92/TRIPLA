@@ -1,5 +1,12 @@
-package Dataflow;
+/*
+ * Nico Feld - 1169233
+ */
 
+package Dataflow.Analysis;
+
+import Dataflow.CFG;
+import Dataflow.Data.Edge;
+import Dataflow.Data.Vertex;
 import tripla.Code;
 import tripla.SyntaxNode;
 
@@ -8,15 +15,15 @@ import java.util.*;
 public class ReachedUsesStrategy {
 
     private class Pair {
-        private CFGVertex vertex;
+        private Vertex vertex;
         private String id;
 
-        public Pair(CFGVertex vertex, String id) {
+        public Pair(Vertex vertex, String id) {
             this.vertex = vertex;
             this.id = id;
         }
 
-        public CFGVertex getVertex() {
+        public Vertex getVertex() {
             return vertex;
         }
 
@@ -33,10 +40,10 @@ public class ReachedUsesStrategy {
         }
     }
 
-    private HashMap<CFGVertex, HashSet<Pair>> IN = new HashMap<>();
-    private HashMap<CFGVertex, HashSet<Pair>> OUT = new HashMap<>();
-    private HashMap<CFGVertex, HashSet<Pair>> GEN = new HashMap<>();
-    private HashMap<CFGVertex, List<String>> KILL = new HashMap<>();
+    private HashMap<Vertex, HashSet<Pair>> IN = new HashMap<>();
+    private HashMap<Vertex, HashSet<Pair>> OUT = new HashMap<>();
+    private HashMap<Vertex, HashSet<Pair>> GEN = new HashMap<>();
+    private HashMap<Vertex, List<String>> KILL = new HashMap<>();
 
 
     public void compute(CFG cfg) {
@@ -45,7 +52,7 @@ public class ReachedUsesStrategy {
         GEN.clear();
         KILL.clear();
 
-        for (CFGVertex v : cfg.vertexSet()) {
+        for (Vertex v : cfg.vertexSet()) {
 
             if (v.getSyntaxNode() == null) continue;
 
@@ -80,13 +87,13 @@ public class ReachedUsesStrategy {
         }
 
         for (int i = 0; i < 1000; i++) {
-            for (CFGVertex v : cfg.vertexSet()) {
+            for (Vertex v : cfg.vertexSet()) {
 
                 if (v.getSyntaxNode() == null) continue;
 
                 HashSet<Pair> allIN = new HashSet<>();
 
-                for (CFGVertex suc : getValidSuccessors(v,cfg)) {
+                for (Vertex suc : getValidSuccessors(v,cfg)) {
                         allIN.addAll(IN.get(suc));
                 }
 
@@ -102,7 +109,7 @@ public class ReachedUsesStrategy {
             }
         }
 
-        for (CFGVertex v : cfg.vertexSet())
+        for (Vertex v : cfg.vertexSet())
         {
             if (v.getSyntaxNode() == null)
                 continue;
@@ -115,36 +122,24 @@ public class ReachedUsesStrategy {
             {
                 if (KILL.get(v).contains(pair.id))
                 {
-                    LabeledCFGEdge e = new LabeledCFGEdge();
+                    Edge e = new Edge();
                     e.setStyle("dashed");
-                    e.setColor("black");
+                    e.setConstraint(false);
+                    e.setColor("green");
                     cfg.addEdge(v,pair.vertex,e);
                 }
             }
 
-            /*
-            OUT.get(v).stream().filter(pair -> {
-                return KILL.get(v).stream().anyMatch(pair1 -> pair1.id.equals(pair.id));
-            }).forEach(pair -> {
-                System.out.println(v);
-                System.out.println(pair);
-                cfg.addEdge(v,pair.vertex,new LabeledCFGEdge("___",true));
-            });
-*/
         }
-
-        //IN.keySet().stream().forEach(cfgVertex -> System.out.println(cfgVertex.getLabel()));
-
-        System.out.println("Done");
 
     }
 
-    private ArrayList<CFGVertex> getValidSuccessors(CFGVertex root,CFG cfg)
+    private ArrayList<Vertex> getValidSuccessors(Vertex root, CFG cfg)
     {
-        ArrayList<CFGVertex> list = new ArrayList<>();
-        for (LabeledCFGEdge e : cfg.outgoingEdgesOf(root))
+        ArrayList<Vertex> list = new ArrayList<>();
+        for (Edge e : cfg.outgoingEdgesOf(root))
         {
-            CFGVertex target = cfg.getEdgeTarget(e);
+            Vertex target = cfg.getEdgeTarget(e);
             if (target.getSyntaxNode() == null){
                 list.addAll(getValidSuccessors(target,cfg));
             } else
@@ -155,50 +150,4 @@ public class ReachedUsesStrategy {
         return list;
     }
 
-    private ArrayList<CFGVertex> getValidPredecessor(CFGVertex root,CFG cfg)
-    {
-        ArrayList<CFGVertex> list = new ArrayList<>();
-        for (LabeledCFGEdge e : cfg.incomingEdgesOf(root))
-        {
-            CFGVertex target = cfg.getEdgeSource(e);
-            if (target.getSyntaxNode() == null){
-                list.addAll(getValidPredecessor(target,cfg));
-            } else
-            {
-                list.add(target);
-            }
-        }
-        return list;
-    }
-
-    /*
-    private ArrayList<CFGVertex> getValidPredecessor(CFGVertex root,CFG cfg)
-    {
-        ArrayList<CFGVertex> list = new ArrayList<>();
-        for (LabeledCFGEdge e : cfg.incomingEdgesOf(root))
-        {
-            CFGVertex target = cfg.getEdgeSource(e);
-            if (target.getSyntaxNode() == null){
-                list.addAll(getValidPredecessor(target,cfg));
-            } else
-            {
-                switch (target.getSyntaxNode().getSynCode())
-                {
-                    case FUNCTION_DEFINITION:
-                    case ASSIGN:
-                    case ID:
-                    {
-                        list.add(target);
-                        break;
-                    }
-                    default:
-                    {
-                        list.addAll(getValidPredecessor(target,cfg));
-                    }
-                }
-            }
-        }
-        return list;
-    }
-*/
 }

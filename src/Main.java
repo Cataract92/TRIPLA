@@ -5,11 +5,10 @@
 import CodeGenerator.Instruction;
 import CodeGenerator.Label;
 import Dataflow.*;
+import Dataflow.Analysis.ReachedUsesStrategy;
+import Dataflow.Export.DotExportStrategy;
 import cup.Parser;
 import flex.Lexer;
-import org.jgrapht.Graphs;
-import org.jgrapht.ext.DOTExporter;
-import org.jgrapht.ext.IntegerNameProvider;
 import tripla.SyntaxNode;
 import tripla.SyntaxTreeManager;
 
@@ -20,46 +19,68 @@ import java.util.HashMap;
 public class Main {
     public static void main(String argv[]) {
         if (argv.length != 2) {
-            System.out.println("Usage: TRIPLA.jar path/to/sample.txt path/to/output.json");
+            System.out.println("Usage: TRIPLA.jar path/to/sample.tripla path/to/output");
             return;
         }
 
-        try {
-            Reader input = new FileReader(argv[0]);
-            Parser p = new Parser(new Lexer(input));
+        File source = new File(argv[0]);
 
-            SyntaxNode result = ((SyntaxNode) p.parse().value);
+        String output = argv[1]+"/"+source.getName().substring(0,source.getName().lastIndexOf("."));
+
+        SyntaxNode result = buildAndPrintTree(source,output);
+
+        doDataflowAnalysis(result,output);
+
+        printInstructions(result,output);
+    }
+
+    private static SyntaxNode buildAndPrintTree(File sample, String output) {
+
+        SyntaxNode result = null;
+        try {
+            Reader input = new FileReader(sample);
+
+            Parser p = new Parser(new Lexer(input));
+            result = ((SyntaxNode) p.parse().value);
 
             SyntaxTreeManager stm = SyntaxTreeManager.getInstance();
 
             stm.optimizeTree(result);
-            stm.toFile(argv[1],result);
+            stm.toFile(output+".json",result);
 
-            CFG cfg = new CFG("",result,"in","out",new HashMap<>());
-
-            cfg.mergeWithSubGraphs();
-
-            new ReachedUsesStrategy().compute(cfg);
-
-            cfg.export(new CFGDotExport());
-            //new DOTExporter<>(new IntegerNameProvider<>(), CFGVertex::getLabel, LabeledCFGEdge::getLabel).export(new PrintWriter(System.out),cfg);
-
-            ArrayList<Instruction> code = result.code(new HashMap<>(),0);
-
-
-            Label.replaceLabels(code);
-
-            /*
-            for (Instruction instruction : code)
-            {
-                System.out.println(instruction.toString());
-            }
-
-            System.out.println("Output: " + argv[1]);
-            */
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return result;
     }
+
+    private static void doDataflowAnalysis(SyntaxNode root, String output)
+    {
+        CFG cfg = new CFG(root,"in","out");
+
+        new ReachedUsesStrategy().compute(cfg);
+
+        cfg.export(new DotExportStrategy(),output+".dot");
+    }
+
+    private static void printInstructions(SyntaxNode root, String output)
+    {
+        ArrayList<Instruction> code = root.code(new HashMap<>(),0);
+
+        Label.replaceLabels(code);
+
+        try {
+            FileWriter fileWriter = new FileWriter(output+".tram");
+            for (Instruction instruction : code)
+                fileWriter.write(instruction.toString()+"\n");
+
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
 }
 

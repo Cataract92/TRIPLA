@@ -64,8 +64,8 @@
 
     <target name="run" depends="jar">
         <java jar="${basedir}/${ant.project.name}.jar" fork="true">
-            <arg value="res/sample.txt"/>
-            <arg value="tree.json"/>
+            <arg value="res/sample.tripla"/>
+            <arg value="."/>
         </java>
     </target>
 
@@ -75,7 +75,9 @@
             <fileset dir="${basedir}" defaultexcludes="false" includes="**/META-INF/"/>
             <fileset dir="${basedir}" defaultexcludes="false" includes="**/lib/"/>
             <fileset dir="${basedir}" includes="${ant.project.name}.jar"/>
-            <fileset dir="${basedir}" includes="tree.json"/>
+            <fileset dir="${basedir}" includes="sample.json"/>
+            <fileset dir="${basedir}" includes="sample.tram"/>
+            <fileset dir="${basedir}" includes="sample.dot"/>
             <fileset dir="${basedir}/src/flex">
                 <exclude name=".gitkeep"/>
                 <include name="*"/>

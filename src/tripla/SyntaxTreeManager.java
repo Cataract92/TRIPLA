@@ -1,6 +1,5 @@
 package tripla;
 
-import CodeGenerator.Instruction;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
